@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered diabetes prediction system using machine learning">
+    <title>Diabetes Prediction System - AI Medical Diagnosis</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="22" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+                        <path d="M25 10v30M10 25h30" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="25" cy="25" r="5" fill="#ffffff"/>
+                    </svg>
+                </div>
+                <div class="header-text">
+                    <h1>Diabetes Prediction System</h1>
+                    <p class="subtitle">Advanced AI-Powered Medical Diagnosis Assistant</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Information Banner -->
+            <div class="info-banner">
+                <div class="info-icon">📊</div>
+                <div class="info-text">
+                    <h2>About This System</h2>
+                    <p>This machine learning system analyzes four key blood glucose and metabolic markers to predict diabetes risk. Our Random Forest model has been trained on 500 synthetic patient records and provides instant AI-powered analysis with confidence scores.</p>
+                </div>
+            </div>
+
+            <!-- Prediction Form -->
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Enter Patient Laboratory Values</h2>
+                    <p>Please provide accurate measurements for all four parameters below</p>
+                </div>
+
+                <form id="predictionForm" class="prediction-form">
+                    <div class="form-grid">
+                        
+                        <!-- FPG Input -->
+                        <div class="input-group">
+                            <label for="fpg" class="input-label">
+                                <span class="label-text">Fasting Plasma Glucose (FPG)</span>
+                                <span class="info-tooltip" title="Normal: < 100 mg/dL | Prediabetes: 100-125 | Diabetes: ≥ 126">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="fpg" 
+                                    name="FPG" 
+                                    class="form-input"
+                                    placeholder="e.g., 95"
+                                    step="0.1" 
+                                    min="50" 
+                                    max="400" 
+                                    required
+                                >
+                                <span class="input-unit">mg/dL</span>
+                            </div>
+                            <small class="input-hint">Normal range: 70-100 mg/dL</small>
+                        </div>
+
+                        <!-- OGTT Input -->
+                        <div class="input-group">
+                            <label for="ogtt" class="input-label">
+                                <span class="label-text">Oral Glucose Tolerance Test (OGTT)</span>
+                                <span class="info-tooltip" title="Normal: < 140 mg/dL | Prediabetes: 140-199 | Diabetes: ≥ 200">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="ogtt" 
+                                    name="OGTT" 
+                                    class="form-input"
+                                    placeholder="e.g., 120"
+                                    step="0.1" 
+                                    min="50" 
+                                    max="500" 
+                                    required
+                                >
+                                <span class="input-unit">mg/dL</span>
+                            </div>
+                            <small class="input-hint">Normal range: 70-140 mg/dL</small>
+                        </div>
+
+                        <!-- Random Plasma Glucose Input -->
+                        <div class="input-group">
+                            <label for="random_pg" class="input-label">
+                                <span class="label-text">Random Plasma Glucose</span>
+                                <span class="info-tooltip" title="Normal: < 140 mg/dL | Diabetes: ≥ 200 (with symptoms)">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="random_pg" 
+                                    name="Random_Plasma_Glucose" 
+                                    class="form-input"
+                                    placeholder="e.g., 110"
+                                    step="0.1" 
+                                    min="50" 
+                                    max="500" 
+                                    required
+                                >
+                                <span class="input-unit">mg/dL</span>
+                            </div>
+                            <small class="input-hint">Normal range: 70-140 mg/dL</small>
+                        </div>
+
+                        <!-- HbA1c Input -->
+                        <div class="input-group">
+                            <label for="hba1c" class="input-label">
+                                <span class="label-text">Hemoglobin A1c (HbA1c)</span>
+                                <span class="info-tooltip" title="Normal: < 5.7% | Prediabetes: 5.7-6.4% | Diabetes: ≥ 6.5%">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input 
+                                    type="number" 
+                                    id="hba1c" 
+                                    name="HbA1c" 
+                                    class="form-input"
+                                    placeholder="e.g., 5.5"
+                                    step="0.1" 
+                                    min="3" 
+                                    max="15" 
+                                    required
+                                >
+                                <span class="input-unit">%</span>
+                            </div>
+                            <small class="input-hint">Normal range: 4.0-5.6%</small>
+                        </div>
+
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="predictBtn">
+                            <span class="btn-content">
+                                <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                </svg>
+                                <span class="btn-text">Analyze Patient Data</span>
+                            </span>
+                            <span class="btn-loader">
+                                <span class="spinner"></span>
+                                <span>Processing...</span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetBtn">
+                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                            </svg>
+                            Reset Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Result Card -->
+            <div class="result-container" id="resultCard">
+                <div class="result-header">
+                    <h2>Prediction Result</h2>
+                    <button class="close-btn" id="closeResult" aria-label="Close result">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="result-body">
+                    <div class="result-status">
+                        <div class="status-icon" id="resultIcon"></div>
+                        <div class="status-text">
+                            <h3 id="predictionText">--</h3>
+                            <p id="confidenceText" class="confidence-text">--</p>
+                        </div>
+                    </div>
+
+                    <div class="probability-section">
+                        <h4>Detailed Probability Analysis</h4>
+                        
+                        <div class="probability-row">
+                            <div class="probability-info">
+                                <span class="prob-label">Diabetic</span>
+                                <span class="prob-value" id="diabeticProb">--%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar diabetic" id="diabeticBar"></div>
+                            </div>
+                        </div>
+
+                        <div class="probability-row">
+                            <div class="probability-info">
+                                <span class="prob-label">Non-Diabetic</span>
+                                <span class="prob-value" id="nonDiabeticProb">--%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar non-diabetic" id="nonDiabeticBar"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="disclaimer-box">
+                        <div class="disclaimer-icon">⚠️</div>
+                        <div class="disclaimer-content">
+                            <strong>Medical Disclaimer:</strong>
+                            <p>This prediction is for informational and educational purposes only. It should not replace professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for proper medical evaluation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Card -->
+            <div class="error-container" id="errorCard">
+                <div class="error-header">
+                    <div class="error-icon-large">⚠️</div>
+                    <h3>Error Occurred</h3>
+                </div>
+                <div class="error-body">
+                    <p id="errorMessage">An unexpected error occurred</p>
+                </div>
+                <button class="btn btn-secondary" id="closeError">Close</button>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-text">&copy; 2024 Diabetes Prediction System | Powered by Machine Learning & Flask</p>
+                <p class="footer-meta">Model: Random Forest Classifier | Training Data: 500 Synthetic Patient Records</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
