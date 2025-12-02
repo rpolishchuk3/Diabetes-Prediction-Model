@@ -142,7 +142,7 @@ I utilize a **Random Forest Classifier**, an ensemble method that aggregates pre
 
 $$
 \large
-Gini = \sum_{}^{} p_{i}^2
+Gini = 1 - \sum_{}^{} p_{i}^2
 $$
 
 
