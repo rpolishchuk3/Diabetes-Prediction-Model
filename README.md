@@ -87,11 +87,11 @@ project/
 
 ---
 
-# 📊 Statistics & Machine Learning Methodology
+## 📊 Statistics & Machine Learning Methodology
 
 This document outlines the statistical methods, mathematical formulas, and machine learning techniques implemented in `app.py` for the Diabetes Prediction System.
 
-## 1. Data Distribution (Gaussian/Normal)
+### 1. Data Distribution (Gaussian/Normal)
 While synthetic data often uses generation methods, our application loads real-world medical data. Biological markers (like Glucose levels) typically follow a **Normal (Bell Curve) Distribution** in large populations.
 
 ![Normal Distribution](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Normal_Distribution_PDF.svg/640px-Normal_Distribution_PDF.svg.png)
@@ -99,9 +99,9 @@ While synthetic data often uses generation methods, our application loads real-w
 
 * **Statistical Concept:** Data clusters around a mean value ($\mu$) with a specific standard deviation ($\sigma$).
 * **Formula:**
-  $$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$
+$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$
 
-### 💻 Code Implementation (`app.py`)
+#### 💻 Code Implementation (`app.py`)
 In our app, we load this data to analyze the distribution before training:
 
 ``` python
@@ -162,9 +162,3 @@ http://localhost:5000
 - Replace synthetic data with a cloud-hosted database
 
 ---
-
-## 📊 Data Distribution (Gaussian/Normal)
-The underlying assumption for many statistical models (including the scaling applied later) is that biological markers often follow a Normal Distribution.
-
-![alt text](https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcS7I7_DVo3iknFv0QAAdAgbVTYyripJkOmIud8R_rvQZ6XLEhZqdkO69At4_SDgBk_UseUH9SbesS-fxnt5MlHj-Xx6g7Qr91X9stCXsLQe7CkXcUw)
-<sup>Image was taken from</sup>
