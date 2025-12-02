@@ -2,13 +2,7 @@
 A full-stack machine learning application that predicts the likelihood of diabetes using four clinically relevant biomarkers.  
 Built with **Python, Flask, Scikit-Learn, HTML, CSS, and JavaScript** — and deployed on **Render**.
 
-<p align="left">
-  <img src="https://img.shields.io/badge/ML-Random%20Forest-blueviolet" />
-  <img src="https://img.shields.io/badge/Backend-Flask-black" />
-  <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-green" />
-  <img src="https://img.shields.io/badge/Data-Synthetic%20500%20Patients-orange" />
-  <img src="https://img.shields.io/badge/Deployed%20On-Render.com-blue" />
-</p>
+
 
 ## ⚠️ Disclaimer
 
