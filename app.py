@@ -15,7 +15,7 @@ model = None
 scaler = None
 feature_names = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c']
 
-def load_data_from_csv(csv_file_path='diabetes_data.csv'):
+def load_data_from_csv(csv_file_path='diabetes_dataset_500.csv'):
     try:
         print(f"Loading data from: {csv_file_path}")
         
@@ -81,7 +81,7 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
         print(f"ERROR loading CSV file: {str(e)}")
         raise
 
-def train_model(csv_file_path='diabetes_data.csv'):
+def train_model(csv_file_path='diabetes_dataset_500.csv'):
     """Train the Random Forest model on data from CSV file."""
     global model, scaler
     
@@ -242,7 +242,7 @@ def model_info():
     return jsonify(info)
 
 # Train the model when the module loads (OUTSIDE if __name__)
-csv_file = 'diabetes_data.csv'
+csv_file = 'diabetes_dataset_500.csv'
 print("\n" + "="*60)
 print("INITIALIZING DIABETES PREDICTION SYSTEM")
 print("="*60)

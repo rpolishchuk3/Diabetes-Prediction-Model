@@ -193,7 +193,7 @@ $$
 Accuracy = \frac{TruePositives + TrueNegatives}{TotalPredictions}
 $$
 
-**Code Implementation**
+**Code Implementation:**
 
 ```python
 train_score = model.score(X_train_scaled, y_train)
