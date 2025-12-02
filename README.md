@@ -99,7 +99,10 @@ While synthetic data often uses generation methods, our application loads real-w
 
 * **Statistical Concept:** Data clusters around a mean value ($\mu$) with a specific standard deviation ($\sigma$).
 * **Formula:**
-$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$
+
+$#
+f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}
+$#
 
 #### 💻 Code Implementation (`app.py`)
 In our app, we load this data to analyze the distribution before training:
