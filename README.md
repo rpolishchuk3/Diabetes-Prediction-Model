@@ -126,6 +126,7 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
     return df
 ```
 
+
 ### 2. Machine Learning Algorithm: Random Forest
 
 I utilize a **Random Forest Classifier**, an ensemble method that aggregates predictions from multiple decision trees to improve accuracy and reduce overfitting.
@@ -134,6 +135,16 @@ I utilize a **Random Forest Classifier**, an ensemble method that aggregates pre
 
 *Figure 2: Simplified visualization of a Random Forest architecture.*
 *© [Medium](https://medium.com/@denizgunay/random-forest-af5bde5d7e1e)*
+
+**Key Statistical Metrics**
+
+* **Gini Impurity:** Used to decide how to split data nodes.
+
+$$
+\large
+Gini = \sum_{}^{} p_{i}^2
+$$
+
 
 
 ## 🛠️ Installation & Running Locally  
