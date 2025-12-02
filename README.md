@@ -57,20 +57,15 @@ The frontend is built as a clean, responsive medical dashboard with animated pro
 ---
 
 ## 📂 Project Structure  
+```
 project/
-
 ├── app.py # Flask backend, ML training, synthetic data generation
-
 ├── templates/
-
 │   └── index.html # User interface
-
 └── static/
-
     ├── style.css # Dashboard styling + animations
-    
     └── script.js # Frontend logic, AJAX, probability visualization
-
+```
 ---
 
 ## 🧠 How It Works  
