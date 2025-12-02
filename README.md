@@ -177,6 +177,18 @@ $$
 z = \frac{x - \mu}{\sigma}
 $$
 
+**Code Implementation:** The scaler is fitted on training data and then applied to testing data and live predictions.
+
+```python
+# From train_model function
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)  # Calculate mean/std and transform
+X_test_scaled = scaler.transform(X_test)        # Apply saved mean/std
+
+# ... later in predict route ...
+input_scaled = scaler.transform(input_features)
+```
+
 
 
 ## 🛠️ Installation & Running Locally  
