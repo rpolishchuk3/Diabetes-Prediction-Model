@@ -58,11 +58,17 @@ The frontend is built as a clean, responsive medical dashboard with animated pro
 
 ## 📂 Project Structure  
 project/
+
 ├── app.py # Flask backend, ML training, synthetic data generation
+
 ├── templates/
+
 │   └── index.html # User interface
+
 └── static/
+
     ├── style.css # Dashboard styling + animations
+    
     └── script.js # Frontend logic, AJAX, probability visualization
 
 ---
@@ -97,7 +103,7 @@ While synthetic data often uses generation methods, our application loads real-w
 ![Normal Distribution](https://www.simplypsychology.org/wp-content/uploads/normal-distribution.jpeg)
 
 *Figure 1: The Normal Distribution (Bell Curve).*
-*© [SimplyPsychology](simplypsychology.org)*
+*© [SimplyPsychology](https://www.simplypsychology.org/normal-distribution.html)*
 
 * **Statistical Concept:** Data clusters around a mean value ($\mu$) with a specific standard deviation ($\sigma$).
 * **Formula:**
