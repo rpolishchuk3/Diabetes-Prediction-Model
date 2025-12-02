@@ -184,6 +184,33 @@ input_scaled = scaler.transform(input_features)
 ```
 
 
+### 4. Model Evaluation (Accuracy)
+
+I evaluate model performance using **Accuracy Score**, which represents the proportion of correct predictions.
+
+$$
+\large
+Accuracy = \frac{TruePositives + TrueNegatives}{TotalPredictions}
+$$
+
+**Code Implementation**
+
+```python
+train_score = model.score(X_train_scaled, y_train)
+test_score = model.score(X_test_scaled, y_test)
+
+print(f"Training accuracy: {train_score:.4f}")
+print(f"Testing accuracy: {test_score:.4f}")
+```
+
+
+### 5. Probability Calculation (Soft Voting)
+
+
+
+
+
+
 
 
 ## 🛠️ Installation & Running Locally  

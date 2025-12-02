@@ -241,19 +241,23 @@ def model_info():
     
     return jsonify(info)
 
+# Train the model when the module loads (OUTSIDE if __name__)
+csv_file = 'diabetes_data.csv'
+print("\n" + "="*60)
+print("INITIALIZING DIABETES PREDICTION SYSTEM")
+print("="*60)
+
+success = train_model(csv_file)
+
+if not success:
+    print("\n" + "="*60)
+    print("WARNING: Model training failed!")
+    print("The server will start but predictions will not work.")
+    print("="*60 + "\n")
+
+# This only runs when using 'python app.py' directly (not with gunicorn)
 if __name__ == '__main__':
-    # Train the model when the application starts
-    # Make sure 'diabetes_data.csv' is in the same directory as app.py
-    csv_file = 'diabetes_data.csv'
-    
-    success = train_model(csv_file)
-    
-    if success:
-        # Run the Flask application
-        print("\nStarting Flask server...")
-        print("Visit http://127.0.0.1:5000 in your browser\n")
-        port = int(os.environ.get('PORT', 5000))
-        app.run(debug=False, host='0.0.0.0', port=port)
-    else:
-        print("\nFailed to train model. Server not started.")
-        print("Please fix the errors above and try again.")
+    print("\nStarting Flask development server...")
+    print("Visit http://127.0.0.1:5000 in your browser\n")
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
