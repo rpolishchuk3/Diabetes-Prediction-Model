@@ -84,7 +84,7 @@ project/
 
 ### **1. Clone the repository**
 ```bash
-git clone https://github.com/yourusername/diabetes-prediction-app.git
+git clone https://github.com/rpolishchuk3/diabetes-prediction-app.git
 cd diabetes-prediction-app
 ```
 
