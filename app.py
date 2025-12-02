@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, jsonify
 import numpy as np
 import pandas as pd
-import os
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import warnings
+import os
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -15,103 +15,160 @@ model = None
 scaler = None
 feature_names = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c']
 
-def generate_synthetic_data(n_samples=500):
+def load_data_from_csv(csv_file_path='diabetes_data.csv'):
     """
-    Generate synthetic diabetes dataset with medically realistic values.
+    Load diabetes dataset from CSV file.
     
-    Normal ranges:
-    - FPG (Fasting Plasma Glucose): < 100 mg/dL (normal), 100-125 (prediabetes), >= 126 (diabetes)
-    - OGTT (Oral Glucose Tolerance Test): < 140 mg/dL (normal), 140-199 (prediabetes), >= 200 (diabetes)
-    - Random Plasma Glucose: < 140 mg/dL (normal), >= 200 (diabetes if symptomatic)
-    - HbA1c: < 5.7% (normal), 5.7-6.4% (prediabetes), >= 6.5% (diabetes)
+    Expected CSV format:
+    Fasting Plasma Glucose (FPG),Oral Glucose Tolerance Test (OGTT) – 2-hour plasma glucose,Random Plasma Glucose,Hemoglobin A1c (HbA1c),Diagnosed diabetes
+    6.1,9.32,11.2,6.58,yes
     """
-    np.random.seed(42)
-    
-    data = []
-    
-    # Generate diabetic patients (40% of dataset)
-    n_diabetic = int(n_samples * 0.4)
-    for _ in range(n_diabetic):
-        # Diabetic patients - higher values with some variance
-        fpg = np.random.normal(150, 25)  # Mean 150, std 25
-        ogtt = np.random.normal(220, 35)  # Mean 220, std 35
-        random_pg = np.random.normal(210, 30)  # Mean 210, std 30
-        hba1c = np.random.normal(7.5, 1.0)  # Mean 7.5%, std 1.0
+    try:
+        print(f"Loading data from: {csv_file_path}")
         
-        # Ensure values stay in medically reasonable ranges
-        fpg = max(80, min(fpg, 300))
-        ogtt = max(100, min(ogtt, 400))
-        random_pg = max(100, min(random_pg, 400))
-        hba1c = max(4.5, min(hba1c, 14.0))
+        # Read the CSV file
+        df = pd.read_csv(csv_file_path)
         
-        data.append([fpg, ogtt, random_pg, hba1c, 'Yes'])
-    
-    # Generate non-diabetic patients (60% of dataset)
-    n_non_diabetic = n_samples - n_diabetic
-    for _ in range(n_non_diabetic):
-        # Non-diabetic patients - lower values with some variance
-        fpg = np.random.normal(95, 15)  # Mean 95, std 15
-        ogtt = np.random.normal(120, 25)  # Mean 120, std 25
-        random_pg = np.random.normal(110, 20)  # Mean 110, std 20
-        hba1c = np.random.normal(5.3, 0.5)  # Mean 5.3%, std 0.5
+        print(f"Original columns: {df.columns.tolist()}")
         
-        # Ensure values stay in medically reasonable ranges
-        fpg = max(60, min(fpg, 125))
-        ogtt = max(70, min(ogtt, 180))
-        random_pg = max(70, min(random_pg, 180))
-        hba1c = max(4.0, min(hba1c, 6.3))
+        # Rename columns to match our expected format
+        column_mapping = {
+            'Fasting Plasma Glucose (FPG)': 'FPG',
+            'Oral Glucose Tolerance Test (OGTT) – 2-hour plasma glucose': 'OGTT',
+            'Random Plasma Glucose': 'Random_Plasma_Glucose',
+            'Hemoglobin A1c (HbA1c)': 'HbA1c',
+            'Diagnosed diabetes': 'Diagnosed_Diabetes'
+        }
         
-        data.append([fpg, ogtt, random_pg, hba1c, 'No'])
-    
-    # Create DataFrame
-    df = pd.DataFrame(data, columns=['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c', 'Diagnosed_Diabetes'])
-    
-    # Shuffle the dataset
-    df = df.sample(frac=1, random_state=42).reset_index(drop=True)
-    
-    return df
+        df = df.rename(columns=column_mapping)
+        
+        print(f"Renamed columns: {df.columns.tolist()}")
+        print(f"Dataset shape: {df.shape}")
+        print(f"First few rows:\n{df.head()}")
+        
+        # Convert 'Diagnosed_Diabetes' to consistent format (Yes/No)
+        # Handle variations: yes/Yes/YES, no/No/NO
+        df['Diagnosed_Diabetes'] = df['Diagnosed_Diabetes'].astype(str).str.strip().str.lower()
+        df['Diagnosed_Diabetes'] = df['Diagnosed_Diabetes'].replace({'yes': 'Yes', 'no': 'No'})
+        
+        # Check for any unexpected values
+        unique_values = df['Diagnosed_Diabetes'].unique()
+        print(f"Unique values in Diagnosed_Diabetes: {unique_values}")
+        
+        # Count diabetic vs non-diabetic
+        diabetic_count = (df['Diagnosed_Diabetes'] == 'Yes').sum()
+        non_diabetic_count = (df['Diagnosed_Diabetes'] == 'No').sum()
+        
+        print(f"Diabetic cases: {diabetic_count}")
+        print(f"Non-diabetic cases: {non_diabetic_count}")
+        
+        # Check for missing values
+        missing_values = df.isnull().sum()
+        if missing_values.any():
+            print(f"Warning: Missing values found:\n{missing_values[missing_values > 0]}")
+            # Drop rows with missing values
+            df = df.dropna()
+            print(f"After removing missing values, dataset shape: {df.shape}")
+        
+        # Verify all required columns are present
+        required_columns = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c', 'Diagnosed_Diabetes']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
+        
+        return df
+        
+    except FileNotFoundError:
+        print(f"ERROR: CSV file not found at '{csv_file_path}'")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Please ensure the CSV file is in the same directory as app.py")
+        raise
+    except Exception as e:
+        print(f"ERROR loading CSV file: {str(e)}")
+        raise
 
-def train_model():
-    """Train the Random Forest model on synthetic data."""
+def train_model(csv_file_path='diabetes_data.csv'):
+    """Train the Random Forest model on data from CSV file."""
     global model, scaler
     
-    print("Generating synthetic dataset...")
-    df = generate_synthetic_data(500)
-    
-    print(f"Dataset shape: {df.shape}")
-    print(f"Diabetic cases: {(df['Diagnosed_Diabetes'] == 'Yes').sum()}")
-    print(f"Non-diabetic cases: {(df['Diagnosed_Diabetes'] == 'No').sum()}")
-    
-    # Prepare features and target
-    X = df[feature_names].values
-    y = (df['Diagnosed_Diabetes'] == 'Yes').astype(int).values
-    
-    # Split the data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # Scale the features
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-    
-    # Train Random Forest Classifier
-    print("Training Random Forest model...")
-    model = RandomForestClassifier(
-        n_estimators=100,
-        max_depth=10,
-        min_samples_split=5,
-        min_samples_leaf=2,
-        random_state=42
-    )
-    model.fit(X_train_scaled, y_train)
-    
-    # Evaluate the model
-    train_score = model.score(X_train_scaled, y_train)
-    test_score = model.score(X_test_scaled, y_test)
-    
-    print(f"Training accuracy: {train_score:.4f}")
-    print(f"Testing accuracy: {test_score:.4f}")
-    print("Model training completed successfully!")
+    try:
+        print("="*50)
+        print("Loading dataset from CSV file...")
+        print("="*50)
+        
+        # Load data from CSV
+        df = load_data_from_csv(csv_file_path)
+        
+        # Prepare features and target
+        X = df[feature_names].values
+        y = (df['Diagnosed_Diabetes'] == 'Yes').astype(int).values
+        
+        print(f"\nFeature matrix shape: {X.shape}")
+        print(f"Target vector shape: {y.shape}")
+        print(f"Feature statistics:\n{pd.DataFrame(X, columns=feature_names).describe()}")
+        
+        # Split the data
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42, stratify=y
+        )
+        
+        print(f"\nTraining set size: {X_train.shape[0]}")
+        print(f"Testing set size: {X_test.shape[0]}")
+        
+        # Scale the features
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+        
+        # Train Random Forest Classifier
+        print("\nTraining Random Forest model...")
+        model = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=10,
+            min_samples_split=5,
+            min_samples_leaf=2,
+            random_state=42,
+            n_jobs=-1  # Use all CPU cores
+        )
+        model.fit(X_train_scaled, y_train)
+        
+        # Evaluate the model
+        train_score = model.score(X_train_scaled, y_train)
+        test_score = model.score(X_test_scaled, y_test)
+        
+        print(f"\n{'='*50}")
+        print(f"MODEL PERFORMANCE")
+        print(f"{'='*50}")
+        print(f"Training accuracy: {train_score:.4f} ({train_score*100:.2f}%)")
+        print(f"Testing accuracy: {test_score:.4f} ({test_score*100:.2f}%)")
+        
+        # Feature importance
+        feature_importance = pd.DataFrame({
+            'Feature': feature_names,
+            'Importance': model.feature_importances_
+        }).sort_values('Importance', ascending=False)
+        
+        print(f"\nFeature Importance:")
+        for idx, row in feature_importance.iterrows():
+            print(f"  {row['Feature']}: {row['Importance']:.4f}")
+        
+        print(f"\n{'='*50}")
+        print("Model training completed successfully!")
+        print(f"{'='*50}\n")
+        
+        return True
+        
+    except Exception as e:
+        print(f"\n{'='*50}")
+        print(f"ERROR DURING MODEL TRAINING")
+        print(f"{'='*50}")
+        print(f"Error: {str(e)}")
+        print(f"\nPlease check:")
+        print(f"1. CSV file exists in the same directory as app.py")
+        print(f"2. CSV file has the correct column names")
+        print(f"3. CSV file has data in the correct format")
+        return False
 
 @app.route('/')
 def home():
@@ -125,6 +182,10 @@ def predict():
     and returns diabetes prediction.
     """
     try:
+        # Check if model is trained
+        if model is None or scaler is None:
+            return jsonify({'error': 'Model not trained. Please check server logs.'}), 500
+        
         # Get JSON data from request
         data = request.get_json()
         
@@ -134,15 +195,15 @@ def predict():
         random_pg = float(data.get('Random_Plasma_Glucose', 0))
         hba1c = float(data.get('HbA1c', 0))
         
-        # Validate input ranges
-        if not (50 <= fpg <= 400):
-            return jsonify({'error': 'FPG must be between 50 and 400 mg/dL'}), 400
-        if not (50 <= ogtt <= 500):
-            return jsonify({'error': 'OGTT must be between 50 and 500 mg/dL'}), 400
-        if not (50 <= random_pg <= 500):
-            return jsonify({'error': 'Random Plasma Glucose must be between 50 and 500 mg/dL'}), 400
-        if not (3.0 <= hba1c <= 15.0):
-            return jsonify({'error': 'HbA1c must be between 3.0% and 15.0%'}), 400
+        # Validate input ranges (allowing wider ranges for your data)
+        if not (0 <= fpg <= 500):
+            return jsonify({'error': 'FPG must be between 0 and 500'}), 400
+        if not (0 <= ogtt <= 500):
+            return jsonify({'error': 'OGTT must be between 0 and 500'}), 400
+        if not (0 <= random_pg <= 500):
+            return jsonify({'error': 'Random Plasma Glucose must be between 0 and 500'}), 400
+        if not (0 <= hba1c <= 20):
+            return jsonify({'error': 'HbA1c must be between 0% and 20%'}), 400
         
         # Prepare input for prediction
         input_features = np.array([[fpg, ogtt, random_pg, hba1c]])
@@ -187,11 +248,19 @@ def model_info():
     
     return jsonify(info)
 
-
-# Train model when module loads (outside if __name__)
-train_model()
-
 if __name__ == '__main__':
-    # This only runs when testing locally
-    port = int(os.environ.get('PORT', 5000))
-    app.run(debug=False, host='0.0.0.0', port=port)
+    # Train the model when the application starts
+    # Make sure 'diabetes_data.csv' is in the same directory as app.py
+    csv_file = 'diabetes_data.csv'
+    
+    success = train_model(csv_file)
+    
+    if success:
+        # Run the Flask application
+        print("\nStarting Flask server...")
+        print("Visit http://127.0.0.1:5000 in your browser\n")
+        port = int(os.environ.get('PORT', 5000))
+        app.run(debug=False, host='0.0.0.0', port=port)
+    else:
+        print("\nFailed to train model. Server not started.")
+        print("Please fix the errors above and try again.")
