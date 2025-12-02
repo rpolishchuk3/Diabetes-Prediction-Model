@@ -86,17 +86,21 @@ project/
 ```bash
 git clone https://github.com/yourusername/diabetes-prediction-app.git
 cd diabetes-prediction-app
+```
 
 ### **2. Install dependencies**
 ```bash
 pip install -r requirements.txt
+```
 
 ### **3. Start the application**
 ```bash
 python app.py
+```
 
 ### **4. Open in browser**
 ```bash
 http://localhost:5000
+```
 
 
