@@ -103,4 +103,22 @@ python app.py
 http://localhost:5000
 ```
 
+---
 
+## 📘 Skills Demonstrated
+- Full-stack machine learning development  
+- Synthetic data generation  
+- REST API design using Flask  
+- JavaScript async workflows (fetch, JSON parsing)  
+- UI/UX design for medical applications  
+- End-to-end ML inference pipeline design  
+- Deployment and hosting using Render  
+
+---
+
+## 📈 Future Enhancements
+- Persist the trained model using `joblib`  
+- Add feature importance visualization  
+- Implement multiple ML model options (LogReg, XGBoost, etc.)  
+- Add user accounts and prediction history tracking  
+- Replace synthetic data with a cloud-hosted database
