@@ -101,7 +101,6 @@ While synthetic data often uses generation methods, our application loads real-w
 *© [SimplyPsychology](https://www.simplypsychology.org/normal-distribution.html)*
 
 * **Statistical Concept:** Data clusters around a mean value ($\mu$) with a specific standard deviation ($\sigma$).
-* **Formula:**
 
 $$
 \large
@@ -163,6 +162,21 @@ model = RandomForestClassifier(
 )
 model.fit(X_train_scaled, y_train)
 ```
+
+
+### 3. Feature Scaling (Z-Score Normalization)
+
+Raw medical data comes in different units (e.g., HbA1c is a small percentage 4-15%, while Glucose can be 70-300+). To prevent larger numbers from dominating the calculation, we use **StandardScaler**.
+
+**Concept:**
+
+* **Goal:** Shift the distribution to have a mean of 0 and a standard deviation of 1.
+
+$$
+\large
+z = \frac{x - \mu}{\sigma}
+$$
+
 
 
 ## 🛠️ Installation & Running Locally  
