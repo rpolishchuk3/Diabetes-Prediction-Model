@@ -16,13 +16,6 @@ scaler = None
 feature_names = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c']
 
 def load_data_from_csv(csv_file_path='diabetes_data.csv'):
-    """
-    Load diabetes dataset from CSV file.
-    
-    Expected CSV format:
-    Fasting Plasma Glucose (FPG),Oral Glucose Tolerance Test (OGTT) – 2-hour plasma glucose,Random Plasma Glucose,Hemoglobin A1c (HbA1c),Diagnosed diabetes
-    6.1,9.32,11.2,6.58,yes
-    """
     try:
         print(f"Loading data from: {csv_file_path}")
         
