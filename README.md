@@ -95,6 +95,7 @@ This document outlines the statistical methods, mathematical formulas, and machi
 While synthetic data often uses generation methods, our application loads real-world medical data. Biological markers (like Glucose levels) typically follow a **Normal (Bell Curve) Distribution** in large populations.
 
 ![Normal Distribution](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Normal_Distribution_PDF.svg/640px-Normal_Distribution_PDF.svg.png)
+
 *Figure 1: The Normal Distribution (Bell Curve).*
 
 * **Statistical Concept:** Data clusters around a mean value ($\mu$) with a specific standard deviation ($\sigma$).
