@@ -85,6 +85,8 @@ project/
 
 This document outlines the statistical methods, mathematical formulas, and machine learning techniques implemented in `app.py` for the Diabetes Prediction System.
 
+
+
 ### 1. Data Distribution (Gaussian/Normal)
 While synthetic data often uses generation methods, our application loads real-world medical data. Biological markers (like Glucose levels) typically follow a **Normal (Bell Curve) Distribution** in large populations.
 
@@ -118,7 +120,7 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
     return df
 ```
 
-<br><br><br>
+
 
 ### 2. Machine Learning Algorithm: Random Forest
 
@@ -157,7 +159,7 @@ model = RandomForestClassifier(
 model.fit(X_train_scaled, y_train)
 ```
 
-<br><br><br>
+
 
 ### 3. Feature Scaling (Z-Score Normalization)
 
