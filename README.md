@@ -86,8 +86,7 @@ project/
 This document outlines the statistical methods, mathematical formulas, and machine learning techniques implemented in `app.py` for the Diabetes Prediction System.
 
 
-
-## 1. Data Distribution (Gaussian/Normal)
+### 1. Data Distribution (Gaussian/Normal)
 While synthetic data often uses generation methods, our application loads real-world medical data. Biological markers (like Glucose levels) typically follow a **Normal (Bell Curve) Distribution** in large populations.
 
 ![Normal Distribution](https://www.simplypsychology.org/wp-content/uploads/normal-distribution.jpeg)
@@ -121,8 +120,7 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
 ```
 
 
-
-## 2. Machine Learning Algorithm: Random Forest
+### 2. Machine Learning Algorithm: Random Forest
 
 I utilize a **Random Forest Classifier**, an ensemble method that aggregates predictions from multiple decision trees to improve accuracy and reduce overfitting.
 
@@ -160,8 +158,7 @@ model.fit(X_train_scaled, y_train)
 ```
 
 
-
-## 3. Feature Scaling (Z-Score Normalization)
+### 3. Feature Scaling (Z-Score Normalization)
 
 Raw medical data comes in different units (e.g., HbA1c is a small percentage 4-15%, while Glucose can be 70-300+). To prevent larger numbers from dominating the calculation, we use **StandardScaler**.
 
@@ -185,6 +182,7 @@ X_test_scaled = scaler.transform(X_test)        # Apply saved mean/std
 # ... later in predict route ...
 input_scaled = scaler.transform(input_features)
 ```
+
 
 
 
