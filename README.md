@@ -1,6 +1,6 @@
 # Diabetes Prediction Web Application  
 A full-stack machine learning application that predicts the likelihood of diabetes using four clinically relevant biomarkers.  
-Built with **Python, Flask, Scikit-Learn, HTML, CSS, and JavaScript** — and deployed on **Render**.
+Built with **Python, Flask, Scikit-Learn, HTML, CSS, and JavaScript** and deployed on **Render**.
 
 
 
@@ -14,7 +14,7 @@ If you have any concerns about your health, blood sugar levels, or potential sym
 ---
 
 ## 📌 Overview  
-This project simulates a real clinical workflow: the user enters four medical measurements, the backend machine learning model evaluates the inputs, and the system returns a prediction with confidence scores — all without refreshing the page.
+This project simulates a real clinical workflow: the user enters four medical measurements, the backend machine learning model evaluates the inputs, and the system returns a prediction with confidence scores all without refreshing the page.
 
 To avoid external datasets, the backend generates a **synthetic dataset of 500 patients** on startup using realistic medical ranges and controlled noise. A Random Forest classifier is trained on this data, and the app exposes a `/predict` API endpoint for real-time inference.
 
