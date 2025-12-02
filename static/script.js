@@ -280,53 +280,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ========== KEYBOARD SHORTCUTS ==========
-
-    document.addEventListener('keydown', function(e) {
-        // Ctrl/Cmd + D: Load diabetic sample
-        if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-            e.preventDefault();
-            loadSampleData(true);
-        }
-
-        // Ctrl/Cmd + N: Load non-diabetic sample
-        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-            e.preventDefault();
-            loadSampleData(false);
-        }
-
-        // Escape: Close cards
-        if (e.key === 'Escape') {
-            hideAllCards();
-        }
-    });
-
-    /**
-     * Load sample data for testing
-     */
-    function loadSampleData(isDiabetic) {
-        if (isDiabetic) {
-            // Diabetic sample
-            fpgInput.value = 155;
-            ogttInput.value = 225;
-            randomPgInput.value = 215;
-            hba1cInput.value = 8.2;
-        } else {
-            // Non-diabetic sample
-            fpgInput.value = 88;
-            ogttInput.value = 115;
-            randomPgInput.value = 102;
-            hba1cInput.value = 5.1;
-        }
-        console.log('Sample data loaded:', isDiabetic ? 'Diabetic' : 'Non-Diabetic');
-    }
-
     // ========== CONSOLE WELCOME MESSAGE ==========
     console.log('%c🏥 Diabetes Prediction System', 'color: #2563eb; font-size: 20px; font-weight: bold;');
-    console.log('%cKeyboard Shortcuts:', 'color: #64748b; font-size: 14px; font-weight: bold;');
-    console.log('• Ctrl/Cmd + D: Load diabetic sample data');
-    console.log('• Ctrl/Cmd + N: Load non-diabetic sample data');
-    console.log('• Escape: Close result/error cards');
     console.log('%cSystem Ready!', 'color: #10b981; font-size: 14px; font-weight: bold;');
 
 });

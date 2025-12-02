@@ -40,8 +40,7 @@ The frontend is built as a clean, responsive medical dashboard with animated pro
 - Professional medical dashboard UI  
 - Animations for probability bars and result transitions  
 - Tooltips explaining each medical parameter  
-- Client-side validation + user-friendly errors  
-- Keyboard shortcuts (e.g., Ctrl+D and Ctrl+N for test values)  
+- Client-side validation + user-friendly errors
 - Fully responsive design for desktop and mobile  
 
 ### ☁️ Deployment  
