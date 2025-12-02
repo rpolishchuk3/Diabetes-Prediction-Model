@@ -47,8 +47,8 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
         # Check for any unexpected values
         unique_values = df['Diagnosed_Diabetes'].unique()
         print(f"Unique values in Diagnosed_Diabetes: {unique_values}")
-        
-        # Count diabetic vs non-diabetic
+    
+
         diabetic_count = (df['Diagnosed_Diabetes'] == 'Yes').sum()
         non_diabetic_count = (df['Diagnosed_Diabetes'] == 'No').sum()
         

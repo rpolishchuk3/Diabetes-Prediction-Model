@@ -129,3 +129,5 @@ http://localhost:5000
 - Implement multiple ML model options (LogReg, XGBoost, etc.)  
 - Add user accounts and prediction history tracking  
 - Replace synthetic data with a cloud-hosted database
+
+![alt text](https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcS7I7_DVo3iknFv0QAAdAgbVTYyripJkOmIud8R_rvQZ6XLEhZqdkO69At4_SDgBk_UseUH9SbesS-fxnt5MlHj-Xx6g7Qr91X9stCXsLQe7CkXcUw)
