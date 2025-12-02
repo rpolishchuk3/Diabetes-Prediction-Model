@@ -94,9 +94,10 @@ This document outlines the statistical methods, mathematical formulas, and machi
 ### 1. Data Distribution (Gaussian/Normal)
 While synthetic data often uses generation methods, our application loads real-world medical data. Biological markers (like Glucose levels) typically follow a **Normal (Bell Curve) Distribution** in large populations.
 
-![Normal Distribution](https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Normal_Distribution_PDF.svg/640px-Normal_Distribution_PDF.svg.png)
+![Normal Distribution](https://www.simplypsychology.org/wp-content/uploads/normal-distribution.jpeg)
 
 *Figure 1: The Normal Distribution (Bell Curve).*
+*© [SimplyPsychology](simplypsychology.org)*
 
 * **Statistical Concept:** Data clusters around a mean value ($\mu$) with a specific standard deviation ($\sigma$).
 * **Formula:**
@@ -106,7 +107,7 @@ $$
 f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}
 $$
 
-**💻 Code Implementation** (`app.py`)
+**Code Implementation** (`app.py`)
 
 In our app, we load this data to analyze the distribution before training:
 
@@ -115,7 +116,7 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
     # ... (error handling omitted)
     df = pd.read_csv(csv_file_path)
     
-    # Analyzing the class distribution (Diabetic vs Non-Diabetic)
+    # ... 
     diabetic_count = (df['Diagnosed_Diabetes'] == 'Yes').sum()
     non_diabetic_count = (df['Diagnosed_Diabetes'] == 'No').sum()
     
@@ -123,6 +124,16 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
     print(f"Non-diabetic cases: {non_diabetic_count}")
     return df
 ```
+
+### 2. Machine Learning Algorithm: Random Forest
+
+I utilize a **Random Forest Classifier**, an ensemble method that aggregates predictions from multiple decision trees to improve accuracy and reduce overfitting.
+
+![Random Forest](https://miro.medium.com/v2/resize:fit:1400/format:webp/1*R3oJiyaQwyLUyLZL-scDpw.png)
+
+*Figure 2: Simplified visualization of a Random Forest architecture.*
+*© [Medium](https://medium.com/@denizgunay/random-forest-af5bde5d7e1e)*
+
 
 ## 🛠️ Installation & Running Locally  
 
