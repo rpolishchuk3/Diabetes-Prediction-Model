@@ -145,6 +145,24 @@ $$
 Gini = 1 - \sum_{}^{} p_{i}^2
 $$
 
+* **Bagging (Bootstrap Aggregating):** Each tree trains on a random subset of data to reduce overfitting.
+
+**Code Implementation:** We initialize the ensemble with 100 decision trees (n_estimators=100) and use all CPU cores (n_jobs=-1).
+
+```python
+# From train_model function
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier(
+    n_estimators=100,      # Number of voting trees
+    max_depth=10,          # Depth limit to prevent overfitting
+    min_samples_split=5,
+    min_samples_leaf=2,
+    random_state=42,
+    n_jobs=-1
+)
+model.fit(X_train_scaled, y_train)
+```
 
 
 ## 🛠️ Installation & Running Locally  
