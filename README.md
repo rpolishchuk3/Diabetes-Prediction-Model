@@ -118,7 +118,7 @@ def load_data_from_csv(csv_file_path='diabetes_data.csv'):
     return df
 ```
 
-
+<details>
 ### 2. Machine Learning Algorithm: Random Forest
 
 I utilize a **Random Forest Classifier**, an ensemble method that aggregates predictions from multiple decision trees to improve accuracy and reduce overfitting.
@@ -155,6 +155,7 @@ model = RandomForestClassifier(
 )
 model.fit(X_train_scaled, y_train)
 ```
+</details>
 
 
 ### 3. Feature Scaling (Z-Score Normalization)
