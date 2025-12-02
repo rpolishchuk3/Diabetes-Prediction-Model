@@ -187,7 +187,11 @@ def model_info():
     
     return jsonify(info)
 
+
+# Train model when module loads (outside if __name__)
+train_model()
+
 if __name__ == '__main__':
-       train_model()
-       port = int(os.environ.get('PORT', 5000))
-       app.run(debug=False, host='0.0.0.0', port=port)
+    # This only runs when testing locally
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
