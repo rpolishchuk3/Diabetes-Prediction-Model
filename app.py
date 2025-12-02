@@ -6,12 +6,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import warnings
 import os
-
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 
-# Global variables
+# Global variables for model and scaler
 model = None
 scaler = None
 feature_names = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c']
@@ -19,12 +18,13 @@ feature_names = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c']
 def load_data_from_csv(csv_file_path='diabetes_dataset_500.csv'):
     try:
         print(f"Loading data from: {csv_file_path}")
+        
+        # Read the CSV file
         df = pd.read_csv(csv_file_path)
         
-        # Normalize column names to avoid whitespace issues
-        df.columns = df.columns.str.strip()
+        print(f"Original columns: {df.columns.tolist()}")
         
-        # Robust column mapping
+        # Rename columns to match our expected format
         column_mapping = {
             'Fasting Plasma Glucose (FPG)': 'FPG',
             'Oral Glucose Tolerance Test (OGTT) – 2-hour plasma glucose': 'OGTT',
@@ -33,140 +33,231 @@ def load_data_from_csv(csv_file_path='diabetes_dataset_500.csv'):
             'Diagnosed diabetes': 'Diagnosed_Diabetes'
         }
         
-        # Rename only if columns exist
         df = df.rename(columns=column_mapping)
         
-        # Clean the Target Column (Handle Yes/No, 1/0, Pos/Neg)
+        print(f"Renamed columns: {df.columns.tolist()}")
+        print(f"Dataset shape: {df.shape}")
+        print(f"First few rows:\n{df.head()}")
+        
+        # Convert 'Diagnosed_Diabetes' to consistent format (Yes/No)
+        # Handle variations: yes/Yes/YES, no/No/NO
         df['Diagnosed_Diabetes'] = df['Diagnosed_Diabetes'].astype(str).str.strip().str.lower()
+        df['Diagnosed_Diabetes'] = df['Diagnosed_Diabetes'].replace({'yes': 'Yes', 'no': 'No'})
         
-        # Map various "positive" indicators to 1 and "negative" to 0
-        diagnosis_map = {
-            'yes': 1, 'no': 0,
-            'positive': 1, 'negative': 0,
-            '1': 1, '0': 0,
-            '1.0': 1, '0.0': 0
-        }
+        # Check for any unexpected values
+        unique_values = df['Diagnosed_Diabetes'].unique()
+        print(f"Unique values in Diagnosed_Diabetes: {unique_values}")
+    
+
+        diabetic_count = (df['Diagnosed_Diabetes'] == 'Yes').sum()
+        non_diabetic_count = (df['Diagnosed_Diabetes'] == 'No').sum()
         
-        df['target'] = df['Diagnosed_Diabetes'].map(diagnosis_map)
+        print(f"Diabetic cases: {diabetic_count}")
+        print(f"Non-diabetic cases: {non_diabetic_count}")
         
-        # Remove rows where target couldn't be mapped
-        df = df.dropna(subset=['target'])
+        # Check for missing values
+        missing_values = df.isnull().sum()
+        if missing_values.any():
+            print(f"Warning: Missing values found:\n{missing_values[missing_values > 0]}")
+            # Drop rows with missing values
+            df = df.dropna()
+            print(f"After removing missing values, dataset shape: {df.shape}")
         
-        diabetic_count = (df['target'] == 1).sum()
-        non_diabetic_count = (df['target'] == 0).sum()
+        # Verify all required columns are present
+        required_columns = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c', 'Diagnosed_Diabetes']
+        missing_columns = [col for col in required_columns if col not in df.columns]
         
-        print(f"Data Loaded -> Diabetic: {diabetic_count}, Non-Diabetic: {non_diabetic_count}")
-        
-        if diabetic_count == 0 or non_diabetic_count == 0:
-            print("CRITICAL WARNING: Dataset contains only one class. Model will produce constant predictions.")
+        if missing_columns:
+            raise ValueError(f"Missing required columns: {missing_columns}")
         
         return df
         
+    except FileNotFoundError:
+        print(f"ERROR: CSV file not found at '{csv_file_path}'")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Please ensure the CSV file is in the same directory as app.py")
+        raise
     except Exception as e:
         print(f"ERROR loading CSV file: {str(e)}")
         raise
 
 def train_model(csv_file_path='diabetes_dataset_500.csv'):
+    """Train the Random Forest model on data from CSV file."""
     global model, scaler
+    
     try:
+        print("="*50)
+        print("Loading dataset from CSV file...")
+        print("="*50)
+        
+        # Load data from CSV
         df = load_data_from_csv(csv_file_path)
         
+        # Prepare features and target
         X = df[feature_names].values
-        y = df['target'].values
+        y = (df['Diagnosed_Diabetes'] == 'Yes').astype(int).values
         
+        print(f"\nFeature matrix shape: {X.shape}")
+        print(f"Target vector shape: {y.shape}")
+        print(f"Feature statistics:\n{pd.DataFrame(X, columns=feature_names).describe()}")
+        
+        # Split the data
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42, stratify=y
         )
         
+        print(f"\nTraining set size: {X_train.shape[0]}")
+        print(f"Testing set size: {X_test.shape[0]}")
+        
+        # Scale the features
         scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
         
-        print("Training Random Forest model...")
+        # Train Random Forest Classifier
+        print("\nTraining Random Forest model...")
         model = RandomForestClassifier(
             n_estimators=100,
             max_depth=10,
-            random_state=42
+            min_samples_split=5,
+            min_samples_leaf=2,
+            random_state=42,
+            n_jobs=-1  # Use all CPU cores
         )
         model.fit(X_train_scaled, y_train)
         
-        score = model.score(X_test_scaled, y_test)
-        print(f"Model trained successfully. Accuracy: {score:.2f}")
+        # Evaluate the model
+        train_score = model.score(X_train_scaled, y_train)
+        test_score = model.score(X_test_scaled, y_test)
+        
+        print(f"\n{'='*50}")
+        print(f"MODEL PERFORMANCE")
+        print(f"{'='*50}")
+        print(f"Training accuracy: {train_score:.4f} ({train_score*100:.2f}%)")
+        print(f"Testing accuracy: {test_score:.4f} ({test_score*100:.2f}%)")
+        
+        # Feature importance
+        feature_importance = pd.DataFrame({
+            'Feature': feature_names,
+            'Importance': model.feature_importances_
+        }).sort_values('Importance', ascending=False)
+        
+        print(f"\nFeature Importance:")
+        for idx, row in feature_importance.iterrows():
+            print(f"  {row['Feature']}: {row['Importance']:.4f}")
+        
+        print(f"\n{'='*50}")
+        print("Model training completed successfully!")
+        print(f"{'='*50}\n")
+        
         return True
         
     except Exception as e:
-        print(f"Training Failed: {str(e)}")
+        print(f"\n{'='*50}")
+        print(f"ERROR DURING MODEL TRAINING")
+        print(f"{'='*50}")
+        print(f"Error: {str(e)}")
+        print(f"\nPlease check:")
+        print(f"1. CSV file exists in the same directory as app.py")
+        print(f"2. CSV file has the correct column names")
+        print(f"3. CSV file has data in the correct format")
         return False
 
 @app.route('/')
 def home():
+    """Render the main page."""
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    """
+    Prediction endpoint that accepts JSON data with 4 medical features
+    and returns diabetes prediction.
+    """
     try:
-        if model is None:
-            return jsonify({'error': 'Model not trained'}), 500
+        # Check if model is trained
+        if model is None or scaler is None:
+            return jsonify({'error': 'Model not trained. Please check server logs.'}), 500
         
-        # 1. Get the raw JSON
+        # Get JSON data from request
         data = request.get_json()
-        print(f"\n--- INCOMING REQUEST ---")
-        print(f"Raw JSON received: {data}")  # Debugging line
         
-        if not data:
-            return jsonify({'error': 'No JSON data received'}), 400
-
-        # 2. Normalize keys to lowercase to ensure matching
-        # This fixes the issue if Frontend sends 'fpg' but we expect 'FPG'
-        data_lower = {k.lower(): v for k, v in data.items()}
+        # Extract features
+        fpg = float(data.get('FPG', 0))
+        ogtt = float(data.get('OGTT', 0))
+        random_pg = float(data.get('Random_Plasma_Glucose', 0))
+        hba1c = float(data.get('HbA1c', 0))
         
-        # 3. Extract features safely using lowercase keys
-        try:
-            fpg = float(data_lower.get('fpg', 0))
-            ogtt = float(data_lower.get('ogtt', 0))
-            random_pg = float(data_lower.get('random_plasma_glucose', 0))
-            hba1c = float(data_lower.get('hba1c', 0))
-        except ValueError:
-            return jsonify({'error': 'Inputs must be numbers'}), 400
-
-        print(f"Parsed inputs -> FPG: {fpg}, OGTT: {ogtt}, RPG: {random_pg}, HbA1c: {hba1c}")
-
-        # Check for the "Zero Input" trap
-        if fpg == 0 and ogtt == 0 and random_pg == 0 and hba1c == 0:
-            print("WARNING: All inputs are 0. Possible key mismatch or empty input.")
-
-        # 4. Predict
+        # Validate input ranges (allowing wider ranges for your data)
+        if not (0 <= fpg <= 500):
+            return jsonify({'error': 'FPG must be between 0 and 500'}), 400
+        if not (0 <= ogtt <= 500):
+            return jsonify({'error': 'OGTT must be between 0 and 500'}), 400
+        if not (0 <= random_pg <= 500):
+            return jsonify({'error': 'Random Plasma Glucose must be between 0 and 500'}), 400
+        if not (0 <= hba1c <= 20):
+            return jsonify({'error': 'HbA1c must be between 0% and 20%'}), 400
+        
+        # Prepare input for prediction
         input_features = np.array([[fpg, ogtt, random_pg, hba1c]])
+        
+        # Scale the input
         input_scaled = scaler.transform(input_features)
         
+        # Make prediction
         prediction = model.predict(input_scaled)[0]
         prediction_proba = model.predict_proba(input_scaled)[0]
         
-        # 5. Handle probability array safely
-        # Note: prediction_proba is [prob_class_0, prob_class_1]
-        prob_non_diabetic = float(prediction_proba[0]) * 100
-        prob_diabetic = float(prediction_proba[1]) * 100
-        
+        # Prepare response
         result = {
             'prediction': 'Diabetic' if prediction == 1 else 'Not Diabetic',
-            'confidence': prob_diabetic if prediction == 1 else prob_non_diabetic,
-            'probability_diabetic': prob_diabetic,
-            'probability_non_diabetic': prob_non_diabetic
+            'confidence': float(prediction_proba[prediction]) * 100,
+            'probability_diabetic': float(prediction_proba[1]) * 100,
+            'probability_non_diabetic': float(prediction_proba[0]) * 100
         }
         
-        print(f"Result sent: {result}")
         return jsonify(result)
     
+    except ValueError as e:
+        return jsonify({'error': f'Invalid input: {str(e)}'}), 400
     except Exception as e:
-        print(f"Prediction Error: {e}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Prediction error: {str(e)}'}), 500
 
-# Initialization
+@app.route('/model-info')
+def model_info():
+    """Return information about the trained model."""
+    if model is None:
+        return jsonify({'error': 'Model not trained'}), 500
+    
+    info = {
+        'model_type': 'Random Forest Classifier',
+        'n_estimators': model.n_estimators,
+        'features': feature_names,
+        'feature_importances': {
+            feature: float(importance) 
+            for feature, importance in zip(feature_names, model.feature_importances_)
+        }
+    }
+    
+    return jsonify(info)
+
+# Train the model when the module loads (OUTSIDE if __name__)
 csv_file = 'diabetes_dataset_500.csv'
-if os.path.exists(csv_file):
-    train_model(csv_file)
-else:
-    print(f"WARNING: {csv_file} not found. Model not trained.")
+print("\n" + "="*60)
+print("INITIALIZING DIABETES PREDICTION SYSTEM")
+print("="*60)
 
+success = train_model(csv_file)
+
+if not success:
+    print("\n" + "="*60)
+    print("WARNING: Model training failed!")
+    print("The server will start but predictions will not work.")
+    print("="*60 + "\n")
+
+# This only runs when using 'python app.py' directly (not with gunicorn)
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    print("\nStarting Flask development server...")
+    print("Visit http://127.0.0.1:5000 in your browser\n")
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
