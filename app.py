@@ -15,7 +15,7 @@ model = None
 scaler = None
 feature_names = ['FPG', 'OGTT', 'Random_Plasma_Glucose', 'HbA1c']
 
-def load_data_from_csv(csv_file_path='diabetes_dataset_500.csv'):
+def load_data_from_csv(csv_file_path='diabetes_dataset_1000.csv'):
     try:
         print(f"Loading data from: {csv_file_path}")
         
@@ -81,7 +81,7 @@ def load_data_from_csv(csv_file_path='diabetes_dataset_500.csv'):
         print(f"ERROR loading CSV file: {str(e)}")
         raise
 
-def train_model(csv_file_path='diabetes_dataset_500.csv'):
+def train_model(csv_file_path='diabetes_dataset_1000.csv'):
     """Train the Random Forest model on data from CSV file."""
     global model, scaler
     
@@ -101,9 +101,9 @@ def train_model(csv_file_path='diabetes_dataset_500.csv'):
         print(f"Target vector shape: {y.shape}")
         print(f"Feature statistics:\n{pd.DataFrame(X, columns=feature_names).describe()}")
         
-        # Split the data
+        # Split the data with more test data to better evaluate
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
+            X, y, test_size=0.25, random_state=42, stratify=y
         )
         
         print(f"\nTraining set size: {X_train.shape[0]}")
@@ -114,15 +114,18 @@ def train_model(csv_file_path='diabetes_dataset_500.csv'):
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
         
-        # Train Random Forest Classifier
+        # Train Random Forest Classifier with settings to prevent overconfidence
         print("\nTraining Random Forest model...")
         model = RandomForestClassifier(
-            n_estimators=100,
-            max_depth=10,
-            min_samples_split=5,
-            min_samples_leaf=2,
+            n_estimators=200,          # More trees for stability
+            max_depth=6,               # Shallower = less overfitting
+            min_samples_split=20,      # Need more samples to make a split
+            min_samples_leaf=10,       # Bigger leaf nodes
+            max_features='sqrt',       # More randomness in feature selection
+            min_impurity_decrease=0.001,  # Don't split unless meaningful
             random_state=42,
-            n_jobs=-1  # Use all CPU cores
+            n_jobs=-1,
+            class_weight='balanced'    # Handle class imbalance
         )
         model.fit(X_train_scaled, y_train)
         
@@ -145,6 +148,23 @@ def train_model(csv_file_path='diabetes_dataset_500.csv'):
         print(f"\nFeature Importance:")
         for idx, row in feature_importance.iterrows():
             print(f"  {row['Feature']}: {row['Importance']:.4f}")
+        
+        # Test with some known values to check calibration
+        print(f"\n{'='*50}")
+        print("PROBABILITY CALIBRATION TEST")
+        print(f"{'='*50}")
+        
+        test_cases = [
+            ([85, 120, 115, 4.9], "Clearly Non-Diabetic"),
+            ([110, 165, 180, 6.1], "Borderline"),
+            ([170, 280, 320, 8.4], "Clearly Diabetic")
+        ]
+        
+        for test_vals, description in test_cases:
+            test_input = scaler.transform([test_vals])
+            proba = model.predict_proba(test_input)[0]
+            print(f"\n{description}: {test_vals}")
+            print(f"  Non-Diabetic: {proba[0]*100:.1f}% | Diabetic: {proba[1]*100:.1f}%")
         
         print(f"\n{'='*50}")
         print("Model training completed successfully!")
@@ -242,7 +262,7 @@ def model_info():
     return jsonify(info)
 
 # Train the model when the module loads (OUTSIDE if __name__)
-csv_file = 'diabetes_dataset_500.csv'
+csv_file = 'diabetes_dataset_1000.csv'
 print("\n" + "="*60)
 print("INITIALIZING DIABETES PREDICTION SYSTEM")
 print("="*60)
