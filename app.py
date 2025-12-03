@@ -180,7 +180,7 @@ def train_model(csv_file_path='diabetes_dataset_1000.csv'):
             
             # Apply borderline adjustment if 2+ markers are borderline
             if borderline_count >= 2:
-                uncertainty_factor = 0.4
+                uncertainty_factor = 0.6  # ← Change from 0.4 to 0.6
                 prob_0 = prob_0 * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
                 prob_1 = prob_1 * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
             
@@ -278,7 +278,7 @@ def predict():
         # If 2+ markers are borderline, force more uncertainty
         if borderline_count >= 2:
             # Pull probabilities toward 50-50 for borderline cases
-            uncertainty_factor = 0.4  # How much to pull toward center
+            uncertainty_factor = 0.6  # ← Change from 0.4 to 0.6
             
             prob_non_diabetic = prob_non_diabetic * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
             prob_diabetic = prob_diabetic * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
