@@ -16,7 +16,7 @@ If you have any concerns about your health, blood sugar levels, or potential sym
 ## 📌 Overview  
 This project simulates a real clinical workflow: the user enters four medical measurements, the backend machine learning model evaluates the inputs, and the system returns a prediction with confidence scores all without refreshing the page.
 
-To avoid external datasets, the backend generates a **synthetic dataset of 500 patients** on startup using realistic medical ranges and controlled noise. A Random Forest classifier is trained on this data, and the app exposes a `/predict` API endpoint for real-time inference.
+To avoid external datasets, the backend generates a **synthetic dataset of 1000 patients** on startup using realistic medical ranges and controlled noise. A Random Forest classifier is trained on this data, and the app exposes a `/predict` API endpoint for real-time inference.
 
 The frontend is built as a clean, responsive medical dashboard with animated probability bars and interactive tooltips.
 
@@ -25,7 +25,7 @@ The frontend is built as a clean, responsive medical dashboard with animated pro
 ## 🚀 Features  
 
 ### 🔬 Machine Learning  
-- Automatic generation of **500 medically realistic patient profiles**  
+- Automatic generation of **1000 medically realistic patient profiles**  
 - Realistic diagnostic ranges with controlled data noise  
 - Random Forest classifier with probability output  
 - Train/test split + preprocessing pipeline  
