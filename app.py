@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.calibration import CalibratedClassifierCV
 import warnings
 import os
 warnings.filterwarnings('ignore')
@@ -40,7 +41,6 @@ def load_data_from_csv(csv_file_path='diabetes_dataset_1000.csv'):
         print(f"First few rows:\n{df.head()}")
         
         # Convert 'Diagnosed_Diabetes' to consistent format (Yes/No)
-        # Handle variations: yes/Yes/YES, no/No/NO
         df['Diagnosed_Diabetes'] = df['Diagnosed_Diabetes'].astype(str).str.strip().str.lower()
         df['Diagnosed_Diabetes'] = df['Diagnosed_Diabetes'].replace({'yes': 'Yes', 'no': 'No'})
         
@@ -48,7 +48,6 @@ def load_data_from_csv(csv_file_path='diabetes_dataset_1000.csv'):
         unique_values = df['Diagnosed_Diabetes'].unique()
         print(f"Unique values in Diagnosed_Diabetes: {unique_values}")
     
-
         diabetic_count = (df['Diagnosed_Diabetes'] == 'Yes').sum()
         non_diabetic_count = (df['Diagnosed_Diabetes'] == 'No').sum()
         
@@ -59,7 +58,6 @@ def load_data_from_csv(csv_file_path='diabetes_dataset_1000.csv'):
         missing_values = df.isnull().sum()
         if missing_values.any():
             print(f"Warning: Missing values found:\n{missing_values[missing_values > 0]}")
-            # Drop rows with missing values
             df = df.dropna()
             print(f"After removing missing values, dataset shape: {df.shape}")
         
@@ -82,7 +80,7 @@ def load_data_from_csv(csv_file_path='diabetes_dataset_1000.csv'):
         raise
 
 def train_model(csv_file_path='diabetes_dataset_1000.csv'):
-    """Train the Random Forest model on data from CSV file."""
+    """Train the Random Forest model with aggressive regularization."""
     global model, scaler
     
     try:
@@ -99,11 +97,17 @@ def train_model(csv_file_path='diabetes_dataset_1000.csv'):
         
         print(f"\nFeature matrix shape: {X.shape}")
         print(f"Target vector shape: {y.shape}")
-        print(f"Feature statistics:\n{pd.DataFrame(X, columns=feature_names).describe()}")
         
-        # Split the data with more test data to better evaluate
+        # ADD NOISE to create more uncertainty
+        np.random.seed(42)
+        noise = np.random.normal(0, 0.05, X.shape)
+        X_noisy = X * (1 + noise)
+        
+        print(f"Added 5% random noise to simulate measurement uncertainty")
+        
+        # Split the data
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.25, random_state=42, stratify=y
+            X_noisy, y, test_size=0.3, random_state=42, stratify=y
         )
         
         print(f"\nTraining set size: {X_train.shape[0]}")
@@ -114,19 +118,19 @@ def train_model(csv_file_path='diabetes_dataset_1000.csv'):
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
         
-        # Train Random Forest Classifier with settings to prevent overconfidence
-        print("\nTraining Random Forest model...")
+        # VERY CONSERVATIVE Random Forest settings
+        print("\nTraining Random Forest with extreme regularization...")
         model = RandomForestClassifier(
-            n_estimators=200,          # More trees for stability
-            max_depth=6,               # Shallower = less overfitting
-            min_samples_split=20,      # Need more samples to make a split
-            min_samples_leaf=10,       # Bigger leaf nodes
-            max_features='sqrt',       # More randomness in feature selection
-            min_impurity_decrease=0.001,  # Don't split unless meaningful
+            n_estimators=50,
+            max_depth=3,
+            min_samples_split=100,
+            min_samples_leaf=50,
+            max_features=2,
+            min_impurity_decrease=0.01,
             random_state=42,
-            n_jobs=-1,
-            class_weight='balanced'    # Handle class imbalance
+            n_jobs=-1
         )
+        
         model.fit(X_train_scaled, y_train)
         
         # Evaluate the model
@@ -139,32 +143,55 @@ def train_model(csv_file_path='diabetes_dataset_1000.csv'):
         print(f"Training accuracy: {train_score:.4f} ({train_score*100:.2f}%)")
         print(f"Testing accuracy: {test_score:.4f} ({test_score*100:.2f}%)")
         
-        # Feature importance
-        feature_importance = pd.DataFrame({
-            'Feature': feature_names,
-            'Importance': model.feature_importances_
-        }).sort_values('Importance', ascending=False)
-        
-        print(f"\nFeature Importance:")
-        for idx, row in feature_importance.iterrows():
-            print(f"  {row['Feature']}: {row['Importance']:.4f}")
-        
-        # Test with some known values to check calibration
+        # Test with known values
         print(f"\n{'='*50}")
         print("PROBABILITY CALIBRATION TEST")
         print(f"{'='*50}")
         
         test_cases = [
-            ([85, 120, 115, 4.9], "Clearly Non-Diabetic"),
-            ([110, 165, 180, 6.1], "Borderline"),
-            ([170, 280, 320, 8.4], "Clearly Diabetic")
+            ([82, 108, 95, 4.8], "Clearly Non-Diabetic"),
+            ([110, 165, 180, 6.1], "Borderline (SHOULD BE ~50%)"),
+            ([130, 200, 210, 6.7], "Uncertain"),
+            ([160, 240, 280, 7.5], "Likely Diabetic"),
+            ([200, 300, 350, 9.0], "Clearly Diabetic")
         ]
         
         for test_vals, description in test_cases:
-            test_input = scaler.transform([test_vals])
+            # Extract values
+            fpg, ogtt, random_pg, hba1c = test_vals
+            
+            # Check borderline status
+            fpg_borderline = 100 <= fpg <= 130
+            ogtt_borderline = 140 <= ogtt <= 210
+            random_pg_borderline = 140 <= random_pg <= 210
+            hba1c_borderline = 5.7 <= hba1c <= 7.0
+            borderline_count = sum([fpg_borderline, ogtt_borderline, random_pg_borderline, hba1c_borderline])
+            
+            # Add noise
+            test_input_noisy = np.array(test_vals) * (1 + np.random.normal(0, 0.05, 4))
+            test_input = scaler.transform([test_input_noisy])
             proba = model.predict_proba(test_input)[0]
+            
+            # Apply smoothing
+            MIN_PROB = 0.02
+            MAX_PROB = 0.98
+            prob_0 = np.clip(proba[0], MIN_PROB, MAX_PROB)
+            prob_1 = np.clip(proba[1], MIN_PROB, MAX_PROB)
+            
+            # Apply borderline adjustment if 2+ markers are borderline
+            if borderline_count >= 2:
+                uncertainty_factor = 0.4
+                prob_0 = prob_0 * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
+                prob_1 = prob_1 * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
+            
+            # Normalize
+            total = prob_0 + prob_1
+            prob_0 = prob_0 / total
+            prob_1 = prob_1 / total
+            
             print(f"\n{description}: {test_vals}")
-            print(f"  Non-Diabetic: {proba[0]*100:.1f}% | Diabetic: {proba[1]*100:.1f}%")
+            print(f"  Borderline markers: {borderline_count}/4")
+            print(f"  Non-Diabetic: {prob_0*100:.1f}% | Diabetic: {prob_1*100:.1f}%")
         
         print(f"\n{'='*50}")
         print("Model training completed successfully!")
@@ -177,10 +204,8 @@ def train_model(csv_file_path='diabetes_dataset_1000.csv'):
         print(f"ERROR DURING MODEL TRAINING")
         print(f"{'='*50}")
         print(f"Error: {str(e)}")
-        print(f"\nPlease check:")
-        print(f"1. CSV file exists in the same directory as app.py")
-        print(f"2. CSV file has the correct column names")
-        print(f"3. CSV file has data in the correct format")
+        import traceback
+        traceback.print_exc()
         return False
 
 @app.route('/')
@@ -190,16 +215,11 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """
-    Prediction endpoint that accepts JSON data with 4 medical features
-    and returns diabetes prediction.
-    """
+    """Prediction endpoint with smart borderline detection."""
     try:
-        # Check if model is trained
         if model is None or scaler is None:
             return jsonify({'error': 'Model not trained. Please check server logs.'}), 500
         
-        # Get JSON data from request
         data = request.get_json()
         
         # Extract features
@@ -208,7 +228,7 @@ def predict():
         random_pg = float(data.get('Random_Plasma_Glucose', 0))
         hba1c = float(data.get('HbA1c', 0))
         
-        # Validate input ranges (allowing wider ranges for your data)
+        # Validate input ranges
         if not (0 <= fpg <= 500):
             return jsonify({'error': 'FPG must be between 0 and 500'}), 400
         if not (0 <= ogtt <= 500):
@@ -218,22 +238,65 @@ def predict():
         if not (0 <= hba1c <= 20):
             return jsonify({'error': 'HbA1c must be between 0% and 20%'}), 400
         
-        # Prepare input for prediction
+        # ============================================
+        # BORDERLINE DETECTION
+        # Medical guidelines for prediabetes/borderline cases
+        # ============================================
+        
+        # Check if values are in prediabetic/borderline ranges
+        fpg_borderline = 100 <= fpg <= 130
+        ogtt_borderline = 140 <= ogtt <= 210
+        random_pg_borderline = 140 <= random_pg <= 210
+        hba1c_borderline = 5.7 <= hba1c <= 7.0
+        
+        # Count how many markers are borderline
+        borderline_count = sum([fpg_borderline, ogtt_borderline, random_pg_borderline, hba1c_borderline])
+        
+        # Prepare input
         input_features = np.array([[fpg, ogtt, random_pg, hba1c]])
         
+        # Add measurement noise
+        noise = np.random.normal(0, 0.05, input_features.shape)
+        input_noisy = input_features * (1 + noise)
+        
         # Scale the input
-        input_scaled = scaler.transform(input_features)
+        input_scaled = scaler.transform(input_noisy)
         
         # Make prediction
-        prediction = model.predict(input_scaled)[0]
         prediction_proba = model.predict_proba(input_scaled)[0]
         
-        # Prepare response
+        # ============================================
+        # SMART PROBABILITY ADJUSTMENT
+        # ============================================
+        
+        MIN_PROB = 0.02
+        MAX_PROB = 0.98
+        
+        prob_non_diabetic = np.clip(prediction_proba[0], MIN_PROB, MAX_PROB)
+        prob_diabetic = np.clip(prediction_proba[1], MIN_PROB, MAX_PROB)
+        
+        # If 2+ markers are borderline, force more uncertainty
+        if borderline_count >= 2:
+            # Pull probabilities toward 50-50 for borderline cases
+            uncertainty_factor = 0.4  # How much to pull toward center
+            
+            prob_non_diabetic = prob_non_diabetic * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
+            prob_diabetic = prob_diabetic * (1 - uncertainty_factor) + 0.5 * uncertainty_factor
+        
+        # Normalize
+        total = prob_non_diabetic + prob_diabetic
+        prob_non_diabetic = prob_non_diabetic / total
+        prob_diabetic = prob_diabetic / total
+        
+        # Final prediction
+        final_prediction = 1 if prob_diabetic > 0.5 else 0
+        confidence = prob_diabetic if final_prediction == 1 else prob_non_diabetic
+        
         result = {
-            'prediction': 'Diabetic' if prediction == 1 else 'Not Diabetic',
-            'confidence': float(prediction_proba[prediction]) * 100,
-            'probability_diabetic': float(prediction_proba[1]) * 100,
-            'probability_non_diabetic': float(prediction_proba[0]) * 100
+            'prediction': 'Diabetic' if final_prediction == 1 else 'Not Diabetic',
+            'confidence': float(confidence * 100),
+            'probability_diabetic': float(prob_diabetic * 100),
+            'probability_non_diabetic': float(prob_non_diabetic * 100)
         }
         
         return jsonify(result)
@@ -243,25 +306,8 @@ def predict():
     except Exception as e:
         return jsonify({'error': f'Prediction error: {str(e)}'}), 500
 
-@app.route('/model-info')
-def model_info():
-    """Return information about the trained model."""
-    if model is None:
-        return jsonify({'error': 'Model not trained'}), 500
-    
-    info = {
-        'model_type': 'Random Forest Classifier',
-        'n_estimators': model.n_estimators,
-        'features': feature_names,
-        'feature_importances': {
-            feature: float(importance) 
-            for feature, importance in zip(feature_names, model.feature_importances_)
-        }
-    }
-    
-    return jsonify(info)
 
-# Train the model when the module loads (OUTSIDE if __name__)
+# Train the model when the module loads
 csv_file = 'diabetes_dataset_1000.csv'
 print("\n" + "="*60)
 print("INITIALIZING DIABETES PREDICTION SYSTEM")
@@ -275,7 +321,7 @@ if not success:
     print("The server will start but predictions will not work.")
     print("="*60 + "\n")
 
-# This only runs when using 'python app.py' directly (not with gunicorn)
+# This only runs when using 'python app.py' directly
 if __name__ == '__main__':
     print("\nStarting Flask development server...")
     print("Visit http://127.0.0.1:5000 in your browser\n")
