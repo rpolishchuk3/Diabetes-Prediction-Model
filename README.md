@@ -126,6 +126,18 @@ A single-page interface built with vanilla HTML, CSS, and JavaScript. No framewo
 
 ---
 
+## UI & Design
+
+- Clean, modern two-column layout (info sidebar + input panel)  
+- Simple and intuitive form with grouped inputs (demographics, health, labs)  
+- Helpful placeholders and clear labels for ease of use  
+- Blue accents highlight key actions (e.g., **Predict Diabetes Risk**)  
+- Model stats and disclaimer improve transparency  
+
+---
+
+---
+
 ## Key Insights
 
 - **HbA1c and blood glucose are the dominant predictors.** Values above 6.5% and 126 mg/dL respectively align with the clinical diagnostic thresholds for diabetes - the model learns and reflects this boundary sharply.
