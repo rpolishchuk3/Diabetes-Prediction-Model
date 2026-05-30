@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeResult       = document.getElementById('closeResult');
     const closeError        = document.getElementById('closeError');
 
-    const resultIcon        = document.getElementById('resultIcon');
     const predictionText    = document.getElementById('predictionText');
     const confidenceText    = document.getElementById('confidenceText');
     const diabeticProb      = document.getElementById('diabeticProb');
@@ -81,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const isDiabetic = data.prediction === 'Diabetic';
 
         resultCard.className = 'result-card ' + (isDiabetic ? 'diabetic' : 'non-diabetic');
-        resultIcon.textContent     = isDiabetic ? '🔴' : '✅';
         predictionText.textContent = data.prediction;
         predictionText.className   = isDiabetic ? 'verdict-text diabetic' : 'verdict-text non-diabetic';
         confidenceText.textContent = `Confidence: ${Number(data.confidence).toFixed(1)}%`;
