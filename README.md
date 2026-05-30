@@ -43,12 +43,14 @@ The dataset has a roughly 9:1 class imbalance (non-diabetic vs. diabetic), which
 
 ```
 Diabetes-Prediction-Model/
-│ 
-├── templates/
-│   └── index.html
+│
+├── img/
+│   └── diabetes_risk_assessment.png
 ├── static/
 │   ├── style.css
 │   └── script.js
+├── templates/
+│   └── index.html
 ├── .gitignore
 ├── README.md
 ├── app.py
