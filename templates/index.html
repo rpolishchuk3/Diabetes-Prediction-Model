@@ -28,132 +28,217 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            
+
             <!-- Information Banner -->
             <div class="info-banner">
                 <div class="info-icon">📊</div>
                 <div class="info-text">
                     <h2>About This System</h2>
-                    <p>This machine learning system analyzes four key blood glucose and metabolic markers to predict diabetes risk. Our Random Forest model has been trained on 500 synthetic patient records and provides instant AI-powered analysis with confidence scores.</p>
+                    <p>This machine learning system analyzes eight clinical and lifestyle factors to predict diabetes risk. Our Random Forest model has been trained on 100,000 patient records and provides instant AI-powered analysis with confidence scores.</p>
                 </div>
             </div>
 
             <!-- Prediction Form -->
             <div class="form-container">
                 <div class="form-header">
-                    <h2>Enter Patient Laboratory Values</h2>
-                    <p>Please provide accurate measurements for all four parameters below</p>
+                    <h2>Enter Patient Information</h2>
+                    <p>Please provide accurate values for all eight parameters below</p>
                 </div>
 
                 <form id="predictionForm" class="prediction-form">
                     <div class="form-grid">
-                        
-                        <!-- FPG Input -->
+
+                        <!-- Gender -->
                         <div class="input-group">
-                            <label for="fpg" class="input-label">
-                                <span class="label-text">Fasting Plasma Glucose (FPG)</span>
-                                <span class="info-tooltip" title="Normal: < 100 mg/dL | Prediabetes: 100-125 | Diabetes: ≥ 126">
+                            <label for="gender" class="input-label">
+                                <span class="label-text">Gender</span>
+                                <span class="info-tooltip" title="Biological sex of the patient">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
                                     </svg>
                                 </span>
                             </label>
                             <div class="input-wrapper">
-                                <input 
-                                    type="number" 
-                                    id="fpg" 
-                                    name="FPG" 
-                                    class="form-input"
-                                    placeholder="e.g., 95"
-                                    step="0.1" 
-                                    min="50" 
-                                    max="400" 
-                                    required
-                                >
-                                <span class="input-unit">mg/dL</span>
+                                <select id="gender" name="gender" class="form-input form-select" required>
+                                    <option value="" disabled selected>Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </div>
-                            <small class="input-hint">Normal range: 70-100 mg/dL</small>
+                            <small class="input-hint">Biological sex of the patient</small>
                         </div>
 
-                        <!-- OGTT Input -->
+                        <!-- Age -->
                         <div class="input-group">
-                            <label for="ogtt" class="input-label">
-                                <span class="label-text">Oral Glucose Tolerance Test (OGTT)</span>
-                                <span class="info-tooltip" title="Normal: < 140 mg/dL | Prediabetes: 140-199 | Diabetes: ≥ 200">
+                            <label for="age" class="input-label">
+                                <span class="label-text">Age</span>
+                                <span class="info-tooltip" title="Patient age in years. Risk increases with age.">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
                                     </svg>
                                 </span>
                             </label>
                             <div class="input-wrapper">
-                                <input 
-                                    type="number" 
-                                    id="ogtt" 
-                                    name="OGTT" 
+                                <input
+                                    type="number"
+                                    id="age"
+                                    name="age"
                                     class="form-input"
-                                    placeholder="e.g., 120"
-                                    step="0.1" 
-                                    min="50" 
-                                    max="500" 
+                                    placeholder="e.g., 45"
+                                    step="1"
+                                    min="0"
+                                    max="120"
                                     required
                                 >
-                                <span class="input-unit">mg/dL</span>
+                                <span class="input-unit">yrs</span>
                             </div>
-                            <small class="input-hint">Normal range: 70-140 mg/dL</small>
+                            <small class="input-hint">Range: 0 – 120 years</small>
                         </div>
 
-                        <!-- Random Plasma Glucose Input -->
+                        <!-- Hypertension -->
                         <div class="input-group">
-                            <label for="random_pg" class="input-label">
-                                <span class="label-text">Random Plasma Glucose</span>
-                                <span class="info-tooltip" title="Normal: < 140 mg/dL | Diabetes: ≥ 200 (with symptoms)">
+                            <label for="hypertension" class="input-label">
+                                <span class="label-text">Hypertension</span>
+                                <span class="info-tooltip" title="Whether the patient has been diagnosed with hypertension (high blood pressure)">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
                                     </svg>
                                 </span>
                             </label>
                             <div class="input-wrapper">
-                                <input 
-                                    type="number" 
-                                    id="random_pg" 
-                                    name="Random_Plasma_Glucose" 
-                                    class="form-input"
-                                    placeholder="e.g., 110"
-                                    step="0.1" 
-                                    min="50" 
-                                    max="500" 
-                                    required
-                                >
-                                <span class="input-unit">mg/dL</span>
+                                <select id="hypertension" name="hypertension" class="form-input form-select" required>
+                                    <option value="" disabled selected>Select option</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
                             </div>
-                            <small class="input-hint">Normal range: 70-140 mg/dL</small>
+                            <small class="input-hint">High blood pressure diagnosis</small>
                         </div>
 
-                        <!-- HbA1c Input -->
+                        <!-- Heart Disease -->
+                        <div class="input-group">
+                            <label for="heart_disease" class="input-label">
+                                <span class="label-text">Heart Disease</span>
+                                <span class="info-tooltip" title="Whether the patient has been diagnosed with any heart disease">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <select id="heart_disease" name="heart_disease" class="form-input form-select" required>
+                                    <option value="" disabled selected>Select option</option>
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                            </div>
+                            <small class="input-hint">Any diagnosed heart condition</small>
+                        </div>
+
+                        <!-- Smoking History -->
+                        <div class="input-group">
+                            <label for="smoking_history" class="input-label">
+                                <span class="label-text">Smoking History</span>
+                                <span class="info-tooltip" title="Patient's smoking history. Smoking increases insulin resistance.">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <select id="smoking_history" name="smoking_history" class="form-input form-select" required>
+                                    <option value="" disabled selected>Select history</option>
+                                    <option value="never">Never</option>
+                                    <option value="No Info">No Info</option>
+                                    <option value="current">Current smoker</option>
+                                    <option value="former">Former smoker</option>
+                                    <option value="ever">Ever smoked</option>
+                                    <option value="not current">Not current</option>
+                                </select>
+                            </div>
+                            <small class="input-hint">Current or past smoking status</small>
+                        </div>
+
+                        <!-- BMI -->
+                        <div class="input-group">
+                            <label for="bmi" class="input-label">
+                                <span class="label-text">Body Mass Index (BMI)</span>
+                                <span class="info-tooltip" title="Normal: 18.5–24.9 | Overweight: 25–29.9 | Obese: ≥ 30">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input
+                                    type="number"
+                                    id="bmi"
+                                    name="bmi"
+                                    class="form-input"
+                                    placeholder="e.g., 24.5"
+                                    step="0.1"
+                                    min="10"
+                                    max="70"
+                                    required
+                                >
+                                <span class="input-unit">kg/m²</span>
+                            </div>
+                            <small class="input-hint">Normal range: 18.5 – 24.9</small>
+                        </div>
+
+                        <!-- HbA1c Level -->
                         <div class="input-group">
                             <label for="hba1c" class="input-label">
-                                <span class="label-text">Hemoglobin A1c (HbA1c)</span>
-                                <span class="info-tooltip" title="Normal: < 5.7% | Prediabetes: 5.7-6.4% | Diabetes: ≥ 6.5%">
+                                <span class="label-text">HbA1c Level</span>
+                                <span class="info-tooltip" title="Normal: < 5.7% | Prediabetes: 5.7–6.4% | Diabetes: ≥ 6.5%">
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                                         <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
                                     </svg>
                                 </span>
                             </label>
                             <div class="input-wrapper">
-                                <input 
-                                    type="number" 
-                                    id="hba1c" 
-                                    name="HbA1c" 
+                                <input
+                                    type="number"
+                                    id="hba1c"
+                                    name="HbA1c_level"
                                     class="form-input"
                                     placeholder="e.g., 5.5"
-                                    step="0.1" 
-                                    min="3" 
-                                    max="15" 
+                                    step="0.1"
+                                    min="3"
+                                    max="15"
                                     required
                                 >
                                 <span class="input-unit">%</span>
                             </div>
-                            <small class="input-hint">Normal range: 4.0-5.6%</small>
+                            <small class="input-hint">Normal range: 4.0 – 5.6%</small>
+                        </div>
+
+                        <!-- Blood Glucose Level -->
+                        <div class="input-group">
+                            <label for="blood_glucose" class="input-label">
+                                <span class="label-text">Blood Glucose Level</span>
+                                <span class="info-tooltip" title="Normal fasting: 70–99 mg/dL | Prediabetes: 100–125 | Diabetes: ≥ 126">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
+                                    </svg>
+                                </span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input
+                                    type="number"
+                                    id="blood_glucose"
+                                    name="blood_glucose_level"
+                                    class="form-input"
+                                    placeholder="e.g., 100"
+                                    step="1"
+                                    min="0"
+                                    max="500"
+                                    required
+                                >
+                                <span class="input-unit">mg/dL</span>
+                            </div>
+                            <small class="input-hint">Normal fasting: 70 – 99 mg/dL</small>
                         </div>
 
                     </div>
@@ -204,7 +289,7 @@
 
                     <div class="probability-section">
                         <h4>Detailed Probability Analysis</h4>
-                        
+
                         <div class="probability-row">
                             <div class="probability-info">
                                 <span class="prob-label">Diabetic</span>
@@ -254,7 +339,7 @@
         <footer class="footer">
             <div class="footer-content">
                 <p class="footer-text">&copy; Robert Polishchuk | Student at University of Alberta</p>
-                <p class="footer-meta">About me: <a href="https://www.linkedin.com/in/robert-polishchuk/" target=”_blank”>LinkedIn</a> | <a href="https://github.com/rpolishchuk3" target=”_blank”>GitHub</a></p>
+                <p class="footer-meta">About me: <a href="https://www.linkedin.com/in/robert-polishchuk/" target="_blank">LinkedIn</a> | <a href="https://github.com/rpolishchuk3" target="_blank">GitHub</a></p>
             </div>
         </footer>
     </div>
