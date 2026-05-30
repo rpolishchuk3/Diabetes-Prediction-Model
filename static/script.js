@@ -1,51 +1,45 @@
 // ==========================================
-// DIABETES PREDICTION SYSTEM - JAVASCRIPT
-// Frontend Logic for Form Handling & API Calls
+// DIABETES RISK ASSESSMENT — JAVASCRIPT
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ========== DOM ELEMENT REFERENCES ==========
-    const predictionForm   = document.getElementById('predictionForm');
-    const predictBtn       = document.getElementById('predictBtn');
-    const resetBtn         = document.getElementById('resetBtn');
-    const resultCard       = document.getElementById('resultCard');
-    const errorCard        = document.getElementById('errorCard');
-    const closeResult      = document.getElementById('closeResult');
-    const closeError       = document.getElementById('closeError');
+    const predictionForm    = document.getElementById('predictionForm');
+    const predictBtn        = document.getElementById('predictBtn');
+    const resetBtn          = document.getElementById('resetBtn');
+    const resultCard        = document.getElementById('resultCard');
+    const errorCard         = document.getElementById('errorCard');
+    const closeResult       = document.getElementById('closeResult');
+    const closeError        = document.getElementById('closeError');
 
-    // Result elements
-    const resultIcon       = document.getElementById('resultIcon');
-    const predictionText   = document.getElementById('predictionText');
-    const confidenceText   = document.getElementById('confidenceText');
-    const diabeticProb     = document.getElementById('diabeticProb');
-    const nonDiabeticProb  = document.getElementById('nonDiabeticProb');
-    const diabeticBar      = document.getElementById('diabeticBar');
-    const nonDiabeticBar   = document.getElementById('nonDiabeticBar');
-    const errorMessage     = document.getElementById('errorMessage');
+    const resultIcon        = document.getElementById('resultIcon');
+    const predictionText    = document.getElementById('predictionText');
+    const confidenceText    = document.getElementById('confidenceText');
+    const diabeticProb      = document.getElementById('diabeticProb');
+    const nonDiabeticProb   = document.getElementById('nonDiabeticProb');
+    const diabeticBar       = document.getElementById('diabeticBar');
+    const nonDiabeticBar    = document.getElementById('nonDiabeticBar');
+    const errorMessage      = document.getElementById('errorMessage');
 
-    // Form inputs
-    const genderInput        = document.getElementById('gender');
-    const ageInput           = document.getElementById('age');
-    const hypertensionInput  = document.getElementById('hypertension');
-    const heartDiseaseInput  = document.getElementById('heart_disease');
-    const smokingInput       = document.getElementById('smoking_history');
-    const bmiInput           = document.getElementById('bmi');
-    const hba1cInput         = document.getElementById('hba1c');
-    const bloodGlucoseInput  = document.getElementById('blood_glucose');
+    const genderInput       = document.getElementById('gender');
+    const ageInput          = document.getElementById('age');
+    const hypertensionInput = document.getElementById('hypertension');
+    const heartDiseaseInput = document.getElementById('heart_disease');
+    const smokingInput      = document.getElementById('smoking_history');
+    const bmiInput          = document.getElementById('bmi');
+    const hba1cInput        = document.getElementById('hba1c');
+    const bloodGlucoseInput = document.getElementById('blood_glucose');
 
-    // ========== UTILITY FUNCTIONS ==========
-
+    // ── Loading state ──
     function showLoading() {
         predictBtn.disabled = true;
-        predictBtn.style.opacity = '0.7';
-        predictBtn.style.cursor = 'not-allowed';
+        predictBtn.querySelector('.btn-inner').style.display = 'none';
+        predictBtn.querySelector('.btn-loading').style.display = 'flex';
     }
-
     function hideLoading() {
         predictBtn.disabled = false;
-        predictBtn.style.opacity = '1';
-        predictBtn.style.cursor = 'pointer';
+        predictBtn.querySelector('.btn-inner').style.display = 'flex';
+        predictBtn.querySelector('.btn-loading').style.display = 'none';
     }
 
     function hideAllCards() {
@@ -53,92 +47,70 @@ document.addEventListener('DOMContentLoaded', function () {
         errorCard.style.display  = 'none';
     }
 
-    /**
-     * Validate all form inputs before submission
-     */
+    // ── Validation ──
     function validateInputs(data) {
-        const age         = parseFloat(data.age);
-        const bmi         = parseFloat(data.bmi);
-        const hba1c       = parseFloat(data.HbA1c_level);
+        const age          = parseFloat(data.age);
+        const bmi          = parseFloat(data.bmi);
+        const hba1c        = parseFloat(data.HbA1c_level);
         const bloodGlucose = parseFloat(data.blood_glucose_level);
 
-        if (!data.gender) {
+        if (!data.gender)
             return { valid: false, message: 'Please select a gender.' };
-        }
-        if (isNaN(age) || age < 0 || age > 120) {
+        if (isNaN(age) || age < 0 || age > 120)
             return { valid: false, message: 'Age must be between 0 and 120 years.' };
-        }
-        if (data.hypertension === '' || data.hypertension === undefined) {
+        if (data.hypertension === '' || data.hypertension == null)
             return { valid: false, message: 'Please select hypertension status.' };
-        }
-        if (data.heart_disease === '' || data.heart_disease === undefined) {
+        if (data.heart_disease === '' || data.heart_disease == null)
             return { valid: false, message: 'Please select heart disease status.' };
-        }
-        if (!data.smoking_history) {
+        if (!data.smoking_history)
             return { valid: false, message: 'Please select a smoking history.' };
-        }
-        if (isNaN(bmi) || bmi < 10 || bmi > 70) {
+        if (isNaN(bmi) || bmi < 10 || bmi > 70)
             return { valid: false, message: 'BMI must be between 10 and 70 kg/m².' };
-        }
-        if (isNaN(hba1c) || hba1c < 3 || hba1c > 15) {
+        if (isNaN(hba1c) || hba1c < 3 || hba1c > 15)
             return { valid: false, message: 'HbA1c must be between 3.0% and 15.0%.' };
-        }
-        if (isNaN(bloodGlucose) || bloodGlucose < 0 || bloodGlucose > 500) {
+        if (isNaN(bloodGlucose) || bloodGlucose < 0 || bloodGlucose > 500)
             return { valid: false, message: 'Blood glucose must be between 0 and 500 mg/dL.' };
-        }
 
         return { valid: true };
     }
 
-    /**
-     * Display prediction result
-     */
+    // ── Display result ──
     function displayResult(data) {
         hideAllCards();
 
         const isDiabetic = data.prediction === 'Diabetic';
 
-        resultCard.classList.remove('diabetic');
-        if (isDiabetic) resultCard.classList.add('diabetic');
+        resultCard.className = 'result-card ' + (isDiabetic ? 'diabetic' : 'non-diabetic');
+        resultIcon.textContent     = isDiabetic ? '🔴' : '✅';
+        predictionText.textContent = data.prediction;
+        predictionText.className   = isDiabetic ? 'verdict-text diabetic' : 'verdict-text non-diabetic';
+        confidenceText.textContent = `Confidence: ${Number(data.confidence).toFixed(1)}%`;
 
-        resultIcon.textContent      = isDiabetic ? '🔴' : '✅';
-        predictionText.textContent  = data.prediction;
-        predictionText.className    = isDiabetic ? 'diabetic' : 'non-diabetic';
-        confidenceText.textContent  = `Confidence: ${data.confidence.toFixed(1)}%`;
+        diabeticProb.textContent    = `${Number(data.probability_diabetic).toFixed(1)}%`;
+        nonDiabeticProb.textContent = `${Number(data.probability_non_diabetic).toFixed(1)}%`;
 
-        diabeticProb.textContent    = `${data.probability_diabetic.toFixed(1)}%`;
-        nonDiabeticProb.textContent = `${data.probability_non_diabetic.toFixed(1)}%`;
-
-        // Reset then animate bars
         diabeticBar.style.width    = '0%';
         nonDiabeticBar.style.width = '0%';
         setTimeout(() => {
             diabeticBar.style.width    = `${data.probability_diabetic}%`;
             nonDiabeticBar.style.width = `${data.probability_non_diabetic}%`;
-        }, 100);
+        }, 80);
 
         resultCard.style.display = 'block';
-        setTimeout(() => {
-            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 150);
+        setTimeout(() => resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     }
 
-    /**
-     * Display error message
-     */
+    // ── Display error ──
     function displayError(message) {
         hideAllCards();
         errorMessage.textContent = message;
-        errorCard.style.display  = 'block';
-        setTimeout(() => {
-            errorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 150);
+        errorCard.style.display  = 'flex';
+        setTimeout(() => errorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     }
 
-    // ========== EVENT HANDLERS ==========
-
-    async function handleFormSubmit(event) {
-        event.preventDefault();
+    // ── Submit ──
+    async function handleFormSubmit(e) {
+        e.preventDefault();
 
         const formData = {
             gender:              genderInput.value,
@@ -151,13 +123,8 @@ document.addEventListener('DOMContentLoaded', function () {
             blood_glucose_level: bloodGlucoseInput.value
         };
 
-        console.log('Form data:', formData);
-
         const validation = validateInputs(formData);
-        if (!validation.valid) {
-            displayError(validation.message);
-            return;
-        }
+        if (!validation.valid) { displayError(validation.message); return; }
 
         showLoading();
         hideAllCards();
@@ -168,53 +135,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
-
             const data = await response.json();
-            console.log('Response:', data);
-
             if (response.ok) {
                 displayResult(data);
             } else {
                 displayError(data.error || 'Prediction failed. Please try again.');
             }
-        } catch (error) {
-            console.error('Error:', error);
+        } catch (err) {
             displayError('Network error. Please check your connection and try again.');
         } finally {
             hideLoading();
         }
     }
 
+    // ── Reset ──
     function handleReset() {
         predictionForm.reset();
         hideAllCards();
         diabeticBar.style.width    = '0%';
         nonDiabeticBar.style.width = '0%';
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.style.borderColor = '';
-        });
+        document.querySelectorAll('.field input').forEach(i => i.classList.remove('invalid'));
     }
 
-    // ========== EVENT LISTENERS ==========
+    // ── Listeners ──
     if (predictionForm) predictionForm.addEventListener('submit', handleFormSubmit);
     if (resetBtn)       resetBtn.addEventListener('click', handleReset);
     if (closeResult)    closeResult.addEventListener('click', () => resultCard.style.display = 'none');
     if (closeError)     closeError.addEventListener('click',  () => errorCard.style.display  = 'none');
 
-    // ========== REAL-TIME BORDER VALIDATION (numeric inputs only) ==========
-    document.querySelectorAll('.form-input[type="number"]').forEach(input => {
+    // real-time number validation
+    document.querySelectorAll('.field input[type="number"]').forEach(input => {
         input.addEventListener('input', function () {
-            const value = parseFloat(this.value);
-            const min   = parseFloat(this.getAttribute('min'));
-            const max   = parseFloat(this.getAttribute('max'));
-            if (this.value && (value < min || value > max)) {
-                this.style.borderColor = '#ef4444';
-            } else {
-                this.style.borderColor = '';
-            }
+            const v = parseFloat(this.value);
+            const bad = this.value && (v < +this.min || v > +this.max);
+            this.classList.toggle('invalid', bad);
         });
     });
 
-    console.log('%c🏥 Diabetes Prediction System', 'color: #2563eb; font-size: 20px; font-weight: bold;');
-    console.log('%cSystem Ready!', 'color: #10b981; font-size: 14px; font-weight: bold;');
+    console.log('%c🏥 Diabetes Risk Assessment', 'color:#1d4ed8;font-size:18px;font-weight:600');
+    console.log('%cReady', 'color:#16a34a;font-weight:600');
 });

@@ -3,346 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI-powered diabetes prediction system using machine learning">
-    <title>Diabetes Prediction System - AI Medical Diagnosis</title>
+    <title>Diabetes Risk Assessment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="25" cy="25" r="22" stroke="#ffffff" stroke-width="2.5" fill="none"/>
-                        <path d="M25 10v30M10 25h30" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
-                        <circle cx="25" cy="25" r="5" fill="#ffffff"/>
-                    </svg>
-                </div>
-                <div class="header-text">
-                    <h1>Diabetes Prediction System</h1>
-                    <p class="subtitle">Advanced AI-Powered Medical Diagnosis Assistant</p>
-                </div>
+
+    <!-- Top nav bar -->
+    <nav class="topnav">
+        <div class="topnav-inner">
+            <div class="nav-brand">
+                <span class="nav-cross">+</span>
+                <span class="nav-title">DiabetesRisk</span>
             </div>
-        </header>
+            <div class="nav-meta">
+                <span>ML-Powered Assessment</span>
+                <span class="nav-dot">·</span>
+                <span>100K patient records</span>
+                <span class="nav-dot">·</span>
+                <span>90.8% accuracy</span>
+            </div>
+        </div>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="main-content">
+    <div class="page-layout">
 
-            <!-- Information Banner -->
-            <div class="info-banner">
-                <div class="info-icon">📊</div>
-                <div class="info-text">
-                    <h2>About This System</h2>
-                    <p>This machine learning system analyzes eight clinical and lifestyle factors to predict diabetes risk. Our Random Forest model has been trained on 100,000 patient records and provides instant AI-powered analysis with confidence scores.</p>
-                </div>
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <p class="sidebar-label">About</p>
+                <p class="sidebar-body">This tool analyzes eight clinical and lifestyle markers to estimate your diabetes risk using a trained Random Forest model.</p>
             </div>
 
-            <!-- Prediction Form -->
-            <div class="form-container">
-                <div class="form-header">
-                    <h2>Enter Patient Information</h2>
-                    <p>Please provide accurate values for all eight parameters below</p>
+            <div class="sidebar-section">
+                <p class="sidebar-label">Model Stats</p>
+                <div class="stat-row">
+                    <span class="stat-num">90.8%</span>
+                    <span class="stat-desc">Test accuracy</span>
                 </div>
+                <div class="stat-row">
+                    <span class="stat-num">100K</span>
+                    <span class="stat-desc">Training records</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-num">8</span>
+                    <span class="stat-desc">Input features</span>
+                </div>
+            </div>
 
-                <form id="predictionForm" class="prediction-form">
-                    <div class="form-grid">
+            <div class="sidebar-section">
+                <p class="sidebar-label">Key Markers</p>
+                <ul class="marker-list">
+                    <li><span class="marker-dot"></span>HbA1c ≥ 6.5% → Diabetic range</li>
+                    <li><span class="marker-dot"></span>Blood glucose ≥ 126 mg/dL → Diabetic</li>
+                    <li><span class="marker-dot"></span>BMI ≥ 30 → Obese (higher risk)</li>
+                </ul>
+            </div>
 
-                        <!-- Gender -->
-                        <div class="input-group">
-                            <label for="gender" class="input-label">
-                                <span class="label-text">Gender</span>
-                                <span class="info-tooltip" title="Biological sex of the patient">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <select id="gender" name="gender" class="form-input form-select" required>
-                                    <option value="" disabled selected>Select gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <small class="input-hint">Biological sex of the patient</small>
-                        </div>
+            <div class="sidebar-disclaimer">
+                <p><strong>Disclaimer</strong> — For educational purposes only. Not a substitute for professional medical advice.</p>
+            </div>
+        </aside>
 
-                        <!-- Age -->
-                        <div class="input-group">
-                            <label for="age" class="input-label">
-                                <span class="label-text">Age</span>
-                                <span class="info-tooltip" title="Patient age in years. Risk increases with age.">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <input
-                                    type="number"
-                                    id="age"
-                                    name="age"
-                                    class="form-input"
-                                    placeholder="e.g., 45"
-                                    step="1"
-                                    min="0"
-                                    max="120"
-                                    required
-                                >
-                                <span class="input-unit">yrs</span>
-                            </div>
-                            <small class="input-hint">Range: 0 – 120 years</small>
-                        </div>
+        <!-- MAIN CONTENT -->
+        <main class="main">
 
-                        <!-- Hypertension -->
-                        <div class="input-group">
-                            <label for="hypertension" class="input-label">
-                                <span class="label-text">Hypertension</span>
-                                <span class="info-tooltip" title="Whether the patient has been diagnosed with hypertension (high blood pressure)">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <select id="hypertension" name="hypertension" class="form-input form-select" required>
-                                    <option value="" disabled selected>Select option</option>
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                            </div>
-                            <small class="input-hint">High blood pressure diagnosis</small>
-                        </div>
+            <div class="main-header">
+                <h1 class="main-title">Diabetes Risk<br><em>Assessment</em></h1>
+                <p class="main-subtitle">Fill in the patient details below and run the analysis.</p>
+            </div>
 
-                        <!-- Heart Disease -->
-                        <div class="input-group">
-                            <label for="heart_disease" class="input-label">
-                                <span class="label-text">Heart Disease</span>
-                                <span class="info-tooltip" title="Whether the patient has been diagnosed with any heart disease">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <select id="heart_disease" name="heart_disease" class="form-input form-select" required>
-                                    <option value="" disabled selected>Select option</option>
-                                    <option value="0">No</option>
-                                    <option value="1">Yes</option>
-                                </select>
-                            </div>
-                            <small class="input-hint">Any diagnosed heart condition</small>
-                        </div>
+            <!-- Feature pills -->
+            <div class="feature-pills">
+                <div class="pill">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 8l2 2 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Accurate Prediction
+                </div>
+                <div class="pill">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v6l3.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                    Early Detection
+                </div>
+                <div class="pill">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    Health Insights
+                </div>
+                <div class="pill">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="4" y="1" width="8" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4 5H2.5A1.5 1.5 0 001 6.5v7A1.5 1.5 0 002.5 15h11a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0013.5 5H12" stroke="currentColor" stroke-width="1.4"/></svg>
+                    Secure & Private
+                </div>
+            </div>
 
-                        <!-- Smoking History -->
-                        <div class="input-group">
-                            <label for="smoking_history" class="input-label">
-                                <span class="label-text">Smoking History</span>
-                                <span class="info-tooltip" title="Patient's smoking history. Smoking increases insulin resistance.">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <select id="smoking_history" name="smoking_history" class="form-input form-select" required>
-                                    <option value="" disabled selected>Select history</option>
-                                    <option value="never">Never</option>
-                                    <option value="No Info">No Info</option>
-                                    <option value="current">Current smoker</option>
-                                    <option value="former">Former smoker</option>
-                                    <option value="ever">Ever smoked</option>
-                                    <option value="not current">Not current</option>
-                                </select>
-                            </div>
-                            <small class="input-hint">Current or past smoking status</small>
-                        </div>
+            <!-- FORM -->
+            <form id="predictionForm">
 
-                        <!-- BMI -->
-                        <div class="input-group">
-                            <label for="bmi" class="input-label">
-                                <span class="label-text">Body Mass Index (BMI)</span>
-                                <span class="info-tooltip" title="Normal: 18.5–24.9 | Overweight: 25–29.9 | Obese: ≥ 30">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <input
-                                    type="number"
-                                    id="bmi"
-                                    name="bmi"
-                                    class="form-input"
-                                    placeholder="e.g., 24.5"
-                                    step="0.1"
-                                    min="10"
-                                    max="70"
-                                    required
-                                >
-                                <span class="input-unit">kg/m²</span>
-                            </div>
-                            <small class="input-hint">Normal range: 18.5 – 24.9</small>
-                        </div>
+                <div class="section-label">Patient Demographics</div>
+                <div class="form-grid">
 
-                        <!-- HbA1c Level -->
-                        <div class="input-group">
-                            <label for="hba1c" class="input-label">
-                                <span class="label-text">HbA1c Level</span>
-                                <span class="info-tooltip" title="Normal: < 5.7% | Prediabetes: 5.7–6.4% | Diabetes: ≥ 6.5%">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <input
-                                    type="number"
-                                    id="hba1c"
-                                    name="HbA1c_level"
-                                    class="form-input"
-                                    placeholder="e.g., 5.5"
-                                    step="0.1"
-                                    min="3"
-                                    max="15"
-                                    required
-                                >
-                                <span class="input-unit">%</span>
-                            </div>
-                            <small class="input-hint">Normal range: 4.0 – 5.6%</small>
-                        </div>
-
-                        <!-- Blood Glucose Level -->
-                        <div class="input-group">
-                            <label for="blood_glucose" class="input-label">
-                                <span class="label-text">Blood Glucose Level</span>
-                                <span class="info-tooltip" title="Normal fasting: 70–99 mg/dL | Prediabetes: 100–125 | Diabetes: ≥ 126">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                                        <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zm.5 4.5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0v-4zm0 5.5a.5.5 0 1 0-1 0 .5.5 0 0 0 1 0z"/>
-                                    </svg>
-                                </span>
-                            </label>
-                            <div class="input-wrapper">
-                                <input
-                                    type="number"
-                                    id="blood_glucose"
-                                    name="blood_glucose_level"
-                                    class="form-input"
-                                    placeholder="e.g., 100"
-                                    step="1"
-                                    min="0"
-                                    max="500"
-                                    required
-                                >
-                                <span class="input-unit">mg/dL</span>
-                            </div>
-                            <small class="input-hint">Normal fasting: 70 – 99 mg/dL</small>
-                        </div>
-
+                    <div class="field">
+                        <label for="gender">Gender</label>
+                        <select id="gender" name="gender" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" id="predictBtn">
-                            <span class="btn-content">
-                                <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                                </svg>
-                                <span class="btn-text">Analyze Patient Data</span>
-                            </span>
-                            <span class="btn-loader">
-                                <span class="spinner"></span>
-                                <span>Processing...</span>
-                            </span>
-                        </button>
-                        <button type="button" class="btn btn-secondary" id="resetBtn">
-                            <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
-                            </svg>
-                            Reset Form
-                        </button>
+                    <div class="field">
+                        <label for="age">Age <span class="unit">years</span></label>
+                        <input type="number" id="age" name="age" placeholder="e.g., 45" min="0" max="120" step="1" required>
                     </div>
-                </form>
-            </div>
 
-            <!-- Result Card -->
-            <div class="result-container" id="resultCard">
-                <div class="result-header">
-                    <h2>Prediction Result</h2>
-                    <button class="close-btn" id="closeResult" aria-label="Close result">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
+                    <div class="field">
+                        <label for="hypertension">Hypertension</label>
+                        <select id="hypertension" name="hypertension" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                        <span class="field-hint">High blood pressure diagnosis</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="heart_disease">Heart Disease</label>
+                        <select id="heart_disease" name="heart_disease" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="0">No</option>
+                            <option value="1">Yes</option>
+                        </select>
+                        <span class="field-hint">Any diagnosed heart condition</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="smoking_history">Smoking History</label>
+                        <select id="smoking_history" name="smoking_history" required>
+                            <option value="" disabled selected>Select</option>
+                            <option value="never">Never</option>
+                            <option value="No Info">No Info</option>
+                            <option value="current">Current smoker</option>
+                            <option value="former">Former smoker</option>
+                            <option value="ever">Ever smoked</option>
+                            <option value="not current">Not current</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="bmi">BMI <span class="unit">kg/m²</span></label>
+                        <input type="number" id="bmi" name="bmi" placeholder="e.g., 24.5" min="10" max="70" step="0.1" required>
+                        <span class="field-hint">Normal: 18.5 – 24.9</span>
+                    </div>
+
+                </div>
+
+                <div class="section-label" style="margin-top:32px">Lab Results</div>
+                <div class="form-grid form-grid--2">
+
+                    <div class="field">
+                        <label for="hba1c">HbA1c Level <span class="unit">%</span></label>
+                        <input type="number" id="hba1c" name="HbA1c_level" placeholder="e.g., 5.5" min="3" max="15" step="0.1" required>
+                        <span class="field-hint">Normal &lt; 5.7% · Diabetic ≥ 6.5%</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="blood_glucose">Blood Glucose Level <span class="unit">mg/dL</span></label>
+                        <input type="number" id="blood_glucose" name="blood_glucose_level" placeholder="e.g., 100" min="0" max="500" step="1" required>
+                        <span class="field-hint">Normal fasting: 70 – 99 mg/dL</span>
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-predict" id="predictBtn">
+                        <span class="btn-inner">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <span class="btn-label">Predict Diabetes Risk</span>
+                        </span>
+                        <span class="btn-loading" style="display:none">
+                            <span class="spinner"></span> Analyzing…
+                        </span>
+                    </button>
+                    <button type="button" class="btn-reset" id="resetBtn">
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1 0 1.5-4M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Reset
+                    </button>
+                </div>
+
+            </form>
+
+            <!-- RESULT CARD -->
+            <div class="result-card" id="resultCard" style="display:none">
+                <div class="result-card-header">
+                    <span class="result-label">Assessment Result</span>
+                    <button class="close-btn" id="closeResult">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                     </button>
                 </div>
 
                 <div class="result-body">
-                    <div class="result-status">
-                        <div class="status-icon" id="resultIcon"></div>
-                        <div class="status-text">
-                            <h3 id="predictionText">--</h3>
-                            <p id="confidenceText" class="confidence-text">--</p>
-                        </div>
+                    <div class="result-verdict-col">
+                        <div class="verdict-icon" id="resultIcon"></div>
+                        <div class="verdict-text" id="predictionText">--</div>
+                        <div class="verdict-conf" id="confidenceText">--</div>
                     </div>
-
-                    <div class="probability-section">
-                        <h4>Detailed Probability Analysis</h4>
-
-                        <div class="probability-row">
-                            <div class="probability-info">
-                                <span class="prob-label">Diabetic</span>
-                                <span class="prob-value" id="diabeticProb">--%</span>
+                    <div class="result-bars-col">
+                        <div class="bar-group">
+                            <div class="bar-meta">
+                                <span>Diabetic probability</span>
+                                <strong id="diabeticProb">--%</strong>
                             </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar diabetic" id="diabeticBar"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill--red" id="diabeticBar" style="width:0%"></div>
                             </div>
                         </div>
-
-                        <div class="probability-row">
-                            <div class="probability-info">
-                                <span class="prob-label">Non-Diabetic</span>
-                                <span class="prob-value" id="nonDiabeticProb">--%</span>
+                        <div class="bar-group">
+                            <div class="bar-meta">
+                                <span>Non-diabetic probability</span>
+                                <strong id="nonDiabeticProb">--%</strong>
                             </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar non-diabetic" id="nonDiabeticBar"></div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill--green" id="nonDiabeticBar" style="width:0%"></div>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="disclaimer-box">
-                        <div class="disclaimer-icon">⚠️</div>
-                        <div class="disclaimer-content">
-                            <strong>Medical Disclaimer:</strong>
-                            <p>This prediction is for informational and educational purposes only. It should not replace professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for proper medical evaluation.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Error Card -->
-            <div class="error-container" id="errorCard">
-                <div class="error-header">
-                    <div class="error-icon-large">⚠️</div>
-                    <h3>Error Occurred</h3>
-                </div>
-                <div class="error-body">
-                    <p id="errorMessage">An unexpected error occurred</p>
-                </div>
-                <button class="btn btn-secondary" id="closeError">Close</button>
+            <!-- ERROR CARD -->
+            <div class="error-card" id="errorCard" style="display:none">
+                <svg width="18" height="18" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span id="errorMessage">An error occurred.</span>
+                <button id="closeError">✕</button>
             </div>
 
         </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-content">
-                <p class="footer-text">&copy; Robert Polishchuk | Student at University of Alberta</p>
-                <p class="footer-meta">About me: <a href="https://www.linkedin.com/in/robert-polishchuk/" target="_blank">LinkedIn</a> | <a href="https://github.com/rpolishchuk3" target="_blank">GitHub</a></p>
-            </div>
-        </footer>
     </div>
+
+    <footer class="footer">
+        <span>© Robert Polishchuk — University of Alberta</span>
+        <span class="nav-dot">·</span>
+        <a href="https://www.linkedin.com/in/robert-polishchuk/" target="_blank">LinkedIn</a>
+        <span class="nav-dot">·</span>
+        <a href="https://github.com/rpolishchuk3" target="_blank">GitHub</a>
+    </footer>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
