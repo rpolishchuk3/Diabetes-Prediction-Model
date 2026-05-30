@@ -138,8 +138,6 @@ A single-page interface built with vanilla HTML, CSS, and JavaScript. No framewo
 
 ---
 
----
-
 ## Key Insights
 
 - **HbA1c and blood glucose are the dominant predictors.** Values above 6.5% and 126 mg/dL respectively align with the clinical diagnostic thresholds for diabetes - the model learns and reflects this boundary sharply.
