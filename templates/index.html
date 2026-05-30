@@ -8,14 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-    <!-- Top nav bar -->
     <nav class="topnav">
         <div class="topnav-inner">
             <div class="nav-brand">
@@ -34,7 +33,6 @@
 
     <div class="page-layout">
 
-        <!-- LEFT SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-section">
                 <p class="sidebar-label">About</p>
@@ -73,7 +71,6 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main">
 
             <div class="main-header">
@@ -81,7 +78,6 @@
                 <p class="main-subtitle">Fill in the patient details below and run the analysis.</p>
             </div>
 
-            <!-- Feature pills -->
             <div class="feature-pills">
                 <div class="pill">
                     Accurate Prediction
@@ -97,7 +93,6 @@
                 </div>
             </div>
 
-            <!-- FORM -->
             <form id="predictionForm">
 
                 <div class="section-label">Patient Demographics</div>
@@ -196,7 +191,6 @@
 
             </form>
 
-            <!-- RESULT CARD -->
             <div class="result-card" id="resultCard" style="display:none">
                 <div class="result-card-header">
                     <span class="result-label">Assessment Result</span>
@@ -236,7 +230,6 @@
                 </div>
             </div>
 
-            <!-- ERROR CARD -->
             <div class="error-card" id="errorCard" style="display:none">
                 <span id="errorMessage">An error occurred.</span>
                 <button id="closeError">✕</button>

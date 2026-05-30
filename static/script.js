@@ -1,7 +1,3 @@
-// ==========================================
-// DIABETES RISK ASSESSMENT — JAVASCRIPT
-// ==========================================
-
 document.addEventListener('DOMContentLoaded', function () {
 
     const predictionForm = document.getElementById('predictionForm');
@@ -29,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const hba1cInput = document.getElementById('hba1c');
     const bloodGlucoseInput = document.getElementById('blood_glucose');
 
-    // ── Loading state ──
     function showLoading() {
         predictBtn.disabled = true;
         predictBtn.querySelector('.btn-inner').style.display = 'none';
@@ -46,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function () {
         errorCard.style.display = 'none';
     }
 
-    // ── Validation ──
     function validateInputs(data) {
         const age = parseFloat(data.age);
         const bmi = parseFloat(data.bmi);
@@ -73,13 +67,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return { valid: true };
     }
 
-    // ── Display result ──
     function displayResult(data) {
         hideAllCards();
 
         const isDiabetic = data.prediction === 'Diabetic';
 
-        // Robustness: Fallback calculation if data.confidence is undefined
         const confidenceValue = data.confidence !== undefined
             ? data.confidence
             : Math.max(data.probability_diabetic || 0, data.probability_non_diabetic || 0);
@@ -88,10 +80,8 @@ document.addEventListener('DOMContentLoaded', function () {
         predictionText.textContent = data.prediction || 'Unknown';
         predictionText.className = isDiabetic ? 'verdict-text diabetic' : 'verdict-text non-diabetic';
 
-        // Safely display the formatted confidence
         confidenceText.textContent = `Confidence: ${Number(confidenceValue).toFixed(1)}%`;
 
-        // Safely handle probabilities, defaulting to 0 if missing
         const probDiabetic = data.probability_diabetic || 0;
         const probNonDiabetic = data.probability_non_diabetic || 0;
 
@@ -109,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     }
 
-    // ── Display error ──
     function displayError(message) {
         hideAllCards();
         errorMessage.textContent = message;
@@ -117,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(() => errorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     }
 
-    // ── Submit ──
     async function handleFormSubmit(e) {
         e.preventDefault();
 
@@ -138,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
         showLoading();
         hideAllCards();
 
-
         try {
             const response = await fetch('/predict', {
                 method: 'POST',
@@ -158,7 +145,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // ── Reset ──
     function handleReset() {
         predictionForm.reset();
         hideAllCards();
@@ -167,13 +153,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.field input').forEach(i => i.classList.remove('invalid'));
     }
 
-    // ── Listeners ──
     if (predictionForm) predictionForm.addEventListener('submit', handleFormSubmit);
     if (resetBtn) resetBtn.addEventListener('click', handleReset);
     if (closeResult) closeResult.addEventListener('click', () => resultCard.style.display = 'none');
     if (closeError) closeError.addEventListener('click', () => errorCard.style.display = 'none');
 
-    // real-time number validation
     document.querySelectorAll('.field input[type="number"]').forEach(input => {
         input.addEventListener('input', function () {
             const v = parseFloat(this.value);

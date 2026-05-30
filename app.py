@@ -13,30 +13,16 @@ from sklearn.metrics import (
 
 warnings.filterwarnings('ignore')
 
-# ── Column names as they appear in the CSV ──────────────────────────────────
-
 RAW_FEATURES = [
     'gender', 'age', 'hypertension', 'heart_disease',
     'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
 ]
 TARGET = 'diabetes'
 
-# ── Model artefact path ─────────────────────────────────────────────────────
-
 MODEL_PATH = 'diabetes_model.pkl'
 
 
-# ── Preprocessing ────────────────────────────────────────────────────────────
-
 def preprocess(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Encode categorical columns and return a model-ready DataFrame.
-
-    gender and smoking_history are one-hot encoded so the model makes
-    no assumptions about ordering between categories.  The numeric and
-    binary columns (age, BMI, hypertension, heart_disease, HbA1c,
-    blood_glucose) are used as-is — Random Forest does not need scaling.
-    """
     df = df.copy()
     df['gender']          = df['gender'].str.strip().str.lower()
     df['smoking_history'] = df['smoking_history'].str.strip().str.lower()
@@ -46,23 +32,15 @@ def preprocess(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def align_columns(df: pd.DataFrame, train_columns: list) -> pd.DataFrame:
-    """
-    Make sure inference data has exactly the same columns as the training data.
-    Columns missing at inference time (unseen categories) are filled with 0.
-    """
     for col in train_columns:
         if col not in df.columns:
             df[col] = 0
     return df[train_columns]
 
 
-# ── Training ─────────────────────────────────────────────────────────────────
-
 def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
-    """Load data, train a Random Forest, print evaluation metrics, save model."""
     global model, train_columns
 
-    # 1. Load
     try:
         df = pd.read_csv(csv_path).dropna()
     except FileNotFoundError:
@@ -73,20 +51,14 @@ def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
           f"Diabetic: {df[TARGET].sum()}  "
           f"Non-diabetic: {(df[TARGET] == 0).sum()}")
 
-    # 2. Preprocess
     X = preprocess(df[RAW_FEATURES])
     y = df[TARGET].values
-    train_columns = X.columns.tolist()   # saved so inference can align columns
+    train_columns = X.columns.tolist()
 
-    # 3. Split
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.20, random_state=42, stratify=y
     )
 
-    # 4. Train
-    #    class_weight='balanced' compensates for the ~9:1 class imbalance by
-    #    giving each diabetic sample more weight during training.  This is the
-    #    simplest and most transparent way to handle imbalance for an RF.
     model = RandomForestClassifier(
         n_estimators=200,
         max_depth=10,
@@ -97,7 +69,6 @@ def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
     )
     model.fit(X_train, y_train)
 
-    # 5. Evaluate
     y_pred = model.predict(X_test)
     print("\n── Evaluation (test set) ──────────────────────────────")
     print(classification_report(y_test, y_pred, target_names=['Not Diabetic', 'Diabetic']))
@@ -105,19 +76,15 @@ def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
     cm = confusion_matrix(y_test, y_pred)
     print(f"Confusion matrix:\n  TN={cm[0,0]}  FP={cm[0,1]}\n  FN={cm[1,0]}  TP={cm[1,1]}\n")
 
-    # 6. Feature importances (top 8)
     importances = pd.Series(model.feature_importances_, index=train_columns)
     print("── Top features ───────────────────────────────────────")
     print(importances.nlargest(8).to_string())
     print()
 
-    # 7. Save
     joblib.dump({'model': model, 'train_columns': train_columns}, MODEL_PATH)
     print(f"Model saved to {MODEL_PATH}\n")
     return True
 
-
-# ── Inference ────────────────────────────────────────────────────────────────
 
 def predict_one(input_dict: dict) -> dict:
     row = pd.DataFrame([input_dict])
@@ -129,24 +96,20 @@ def predict_one(input_dict: dict) -> dict:
     prob_non_diabetic = float(proba[0])
     prediction        = 'Diabetic' if prob_diabetic >= 0.5 else 'Not Diabetic'
 
-    # Calculate confidence as the highest probability
     confidence = max(prob_diabetic, prob_non_diabetic) * 100
 
     return {
         'prediction': prediction,
         'probability_diabetic': round(prob_diabetic * 100, 1),
         'probability_non_diabetic': round(prob_non_diabetic * 100, 1),
-        'confidence': round(confidence, 1) # Ensure this is included
+        'confidence': round(confidence, 1)
     }
 
-
-# ── Input validation ─────────────────────────────────────────────────────────
 
 VALID_GENDERS  = {'male', 'female', 'other'}
 VALID_SMOKING  = {'never', 'no info', 'current', 'former', 'ever', 'not current'}
 
 def validate(data: dict) -> str | None:
-    """Return an error message string, or None if input is valid."""
     if str(data.get('gender', '')).strip().lower() not in VALID_GENDERS:
         return f"gender must be one of {sorted(VALID_GENDERS)}"
     if str(data.get('smoking_history', '')).strip().lower() not in VALID_SMOKING:
@@ -168,8 +131,6 @@ def validate(data: dict) -> str | None:
         return f"Invalid or missing field: {exc}"
     return None
 
-
-# ── Flask app ────────────────────────────────────────────────────────────────
 
 app = Flask(__name__)
 model        = None
@@ -201,13 +162,10 @@ def predict():
         return jsonify({'error': str(exc)}), 500
 
 
-# ── Startup ──────────────────────────────────────────────────────────────────
-
 print("=" * 55)
 print("  DIABETES PREDICTION — STARTING")
 print("=" * 55)
 
-# Load a previously saved model if it exists, otherwise train from scratch.
 if os.path.exists(MODEL_PATH):
     artefact      = joblib.load(MODEL_PATH)
     model         = artefact['model']
