@@ -1,153 +1,184 @@
-from flask import Flask, render_template, request, jsonify
+"""
+Diabetes Prediction — Flask App
+================================
+Model:   Random Forest (class_weight='balanced')
+Dataset: diabetes_prediction_dataset.csv
+Author:  Robert
+"""
+
+import os
+import warnings
 import numpy as np
 import pandas as pd
+import joblib
+from flask import Flask, render_template, request, jsonify
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-import warnings
-import os
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score,
+    f1_score, confusion_matrix, classification_report
+)
 
 warnings.filterwarnings('ignore')
 
-app = Flask(__name__)
+# ── Column names as they appear in the CSV ──────────────────────────────────
 
-model = None
-scaler = None
-
-feature_names = [
+RAW_FEATURES = [
     'gender', 'age', 'hypertension', 'heart_disease',
     'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
 ]
+TARGET = 'diabetes'
 
-GENDER_MAP = {'female': 0, 'male': 1, 'other': 2}
-SMOKING_MAP = {
-    'never': 0,
-    'no info': 1,
-    'current': 2,
-    'former': 3,
-    'ever': 4,
-    'not current': 5
-}
+# ── Model artefact path ─────────────────────────────────────────────────────
+
+MODEL_PATH = 'diabetes_model.pkl'
 
 
-def encode_features(df):
+# ── Preprocessing ────────────────────────────────────────────────────────────
+
+def preprocess(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Encode categorical columns and return a model-ready DataFrame.
+
+    gender and smoking_history are one-hot encoded so the model makes
+    no assumptions about ordering between categories.  The numeric and
+    binary columns (age, BMI, hypertension, heart_disease, HbA1c,
+    blood_glucose) are used as-is — Random Forest does not need scaling.
+    """
     df = df.copy()
-    df['gender'] = df['gender'].str.strip().str.lower().map(GENDER_MAP).fillna(2)
-    df['smoking_history'] = df['smoking_history'].str.strip().str.lower().map(SMOKING_MAP).fillna(1)
+    df['gender']          = df['gender'].str.strip().str.lower()
+    df['smoking_history'] = df['smoking_history'].str.strip().str.lower()
+
+    df = pd.get_dummies(df, columns=['gender', 'smoking_history'], drop_first=False)
     return df
 
 
-def load_data_from_csv(csv_file_path='diabetes_prediction_dataset.csv'):
+def align_columns(df: pd.DataFrame, train_columns: list) -> pd.DataFrame:
+    """
+    Make sure inference data has exactly the same columns as the training data.
+    Columns missing at inference time (unseen categories) are filled with 0.
+    """
+    for col in train_columns:
+        if col not in df.columns:
+            df[col] = 0
+    return df[train_columns]
+
+
+# ── Training ─────────────────────────────────────────────────────────────────
+
+def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
+    """Load data, train a Random Forest, print evaluation metrics, save model."""
+    global model, train_columns
+
+    # 1. Load
     try:
-        print(f"Loading data from: {csv_file_path}")
-        df = pd.read_csv(csv_file_path)
-        print(f"Columns: {df.columns.tolist()}")
-        print(f"Dataset shape: {df.shape}")
-
-        missing_values = df.isnull().sum()
-        if missing_values.any():
-            df = df.dropna()
-            print(f"After removing missing values: {df.shape}")
-
-        required_columns = feature_names + ['diabetes']
-        missing_columns = [col for col in required_columns if col not in df.columns]
-        if missing_columns:
-            raise ValueError(f"Missing required columns: {missing_columns}")
-
-        print(f"Diabetic cases:     {(df['diabetes'] == 1).sum()}")
-        print(f"Non-diabetic cases: {(df['diabetes'] == 0).sum()}")
-        return df
-
+        df = pd.read_csv(csv_path).dropna()
     except FileNotFoundError:
-        print(f"ERROR: CSV file not found at '{csv_file_path}'")
-        print(f"Current working directory: {os.getcwd()}")
-        raise
-    except Exception as e:
-        print(f"ERROR loading CSV: {str(e)}")
-        raise
-
-
-def train_model(csv_file_path='diabetes_prediction_dataset.csv'):
-    global model, scaler
-
-    try:
-        print("=" * 50)
-        print("Loading dataset...")
-        print("=" * 50)
-
-        df = load_data_from_csv(csv_file_path)
-        df = encode_features(df)
-
-        X = df[feature_names].values
-        y = df['diabetes'].values
-
-        # ── NO noise added ── the data is clean enough
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=42, stratify=y
-        )
-        print(f"Train: {X_train.shape[0]} | Test: {X_test.shape[0]}")
-
-        scaler = StandardScaler()
-        X_train_s = scaler.fit_transform(X_train)
-        X_test_s  = scaler.transform(X_test)
-
-        # Fix class imbalance with class_weight, use a stronger model
-        print("\nTraining Random Forest (balanced)...")
-        model = RandomForestClassifier(
-            n_estimators=200,
-            max_depth=8,
-            min_samples_split=20,
-            min_samples_leaf=10,
-            max_features='sqrt',
-            class_weight='balanced',   # ← handles 9:1 imbalance
-            random_state=42,
-            n_jobs=-1
-        )
-        model.fit(X_train_s, y_train)
-
-        train_score = model.score(X_train_s, y_train)
-        test_score  = model.score(X_test_s,  y_test)
-        print(f"\nTraining accuracy: {train_score*100:.2f}%")
-        print(f"Testing accuracy:  {test_score*100:.2f}%")
-
-        # Sanity-check with the 5 test cases
-        print(f"\n{'='*50}")
-        print("SANITY CHECK")
-        print(f"{'='*50}")
-        sanity_cases = [
-            ({'gender':'female','age':22,'hypertension':0,'heart_disease':0,
-              'smoking_history':'never','bmi':21.5,'HbA1c_level':4.8,'blood_glucose_level':85},
-             "1 – Definitely NOT Diabetic"),
-            ({'gender':'male','age':40,'hypertension':0,'heart_disease':0,
-              'smoking_history':'former','bmi':27.0,'HbA1c_level':5.9,'blood_glucose_level':120},
-             "2 – Probably Not Diabetic"),
-            ({'gender':'male','age':52,'hypertension':1,'heart_disease':0,
-              'smoking_history':'current','bmi':30.5,'HbA1c_level':6.2,'blood_glucose_level':155},
-             "3 – Borderline"),
-            ({'gender':'female','age':60,'hypertension':1,'heart_disease':0,
-              'smoking_history':'former','bmi':34.0,'HbA1c_level':6.8,'blood_glucose_level':190},
-             "4 – Probably Diabetic"),
-            ({'gender':'male','age':68,'hypertension':1,'heart_disease':1,
-              'smoking_history':'current','bmi':40.0,'HbA1c_level':9.5,'blood_glucose_level':280},
-             "5 – Definitely Diabetic"),
-        ]
-        for case_dict, label in sanity_cases:
-            row = encode_features(pd.DataFrame([case_dict]))
-            scaled = scaler.transform(row[feature_names].values)
-            proba = model.predict_proba(scaled)[0]
-            pred = "Diabetic" if proba[1] > 0.5 else "Not Diabetic"
-            print(f"{label}: {pred} | Non-D: {proba[0]*100:.1f}%  D: {proba[1]*100:.1f}%")
-
-        print(f"\n{'='*50}")
-        print("Model training complete!")
-        print(f"{'='*50}\n")
-        return True
-
-    except Exception as e:
-        print(f"ERROR: {str(e)}")
-        import traceback
-        traceback.print_exc()
+        print(f"ERROR: '{csv_path}' not found (cwd={os.getcwd()})")
         return False
+
+    print(f"Dataset: {df.shape[0]} rows  |  "
+          f"Diabetic: {df[TARGET].sum()}  "
+          f"Non-diabetic: {(df[TARGET] == 0).sum()}")
+
+    # 2. Preprocess
+    X = preprocess(df[RAW_FEATURES])
+    y = df[TARGET].values
+    train_columns = X.columns.tolist()   # saved so inference can align columns
+
+    # 3. Split
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.20, random_state=42, stratify=y
+    )
+
+    # 4. Train
+    #    class_weight='balanced' compensates for the ~9:1 class imbalance by
+    #    giving each diabetic sample more weight during training.  This is the
+    #    simplest and most transparent way to handle imbalance for an RF.
+    model = RandomForestClassifier(
+        n_estimators=200,
+        max_depth=10,
+        min_samples_leaf=5,
+        class_weight='balanced',
+        random_state=42,
+        n_jobs=-1,
+    )
+    model.fit(X_train, y_train)
+
+    # 5. Evaluate
+    y_pred = model.predict(X_test)
+    print("\n── Evaluation (test set) ──────────────────────────────")
+    print(classification_report(y_test, y_pred, target_names=['Not Diabetic', 'Diabetic']))
+
+    cm = confusion_matrix(y_test, y_pred)
+    print(f"Confusion matrix:\n  TN={cm[0,0]}  FP={cm[0,1]}\n  FN={cm[1,0]}  TP={cm[1,1]}\n")
+
+    # 6. Feature importances (top 8)
+    importances = pd.Series(model.feature_importances_, index=train_columns)
+    print("── Top features ───────────────────────────────────────")
+    print(importances.nlargest(8).to_string())
+    print()
+
+    # 7. Save
+    joblib.dump({'model': model, 'train_columns': train_columns}, MODEL_PATH)
+    print(f"Model saved to {MODEL_PATH}\n")
+    return True
+
+
+# ── Inference ────────────────────────────────────────────────────────────────
+
+def predict_one(input_dict: dict) -> dict:
+    """Run the model on a single patient record (as a plain dict)."""
+    row = pd.DataFrame([input_dict])
+    row = preprocess(row)
+    row = align_columns(row, train_columns)
+
+    proba = model.predict_proba(row)[0]
+    prob_diabetic     = float(proba[1])
+    prob_non_diabetic = float(proba[0])
+    prediction        = 'Diabetic' if prob_diabetic >= 0.5 else 'Not Diabetic'
+
+    return {
+        'prediction':               prediction,
+        'probability_diabetic':     round(prob_diabetic * 100, 1),
+        'probability_non_diabetic': round(prob_non_diabetic * 100, 1),
+    }
+
+
+# ── Input validation ─────────────────────────────────────────────────────────
+
+VALID_GENDERS  = {'male', 'female', 'other'}
+VALID_SMOKING  = {'never', 'no info', 'current', 'former', 'ever', 'not current'}
+
+def validate(data: dict) -> str | None:
+    """Return an error message string, or None if input is valid."""
+    if str(data.get('gender', '')).strip().lower() not in VALID_GENDERS:
+        return f"gender must be one of {sorted(VALID_GENDERS)}"
+    if str(data.get('smoking_history', '')).strip().lower() not in VALID_SMOKING:
+        return f"smoking_history must be one of {sorted(VALID_SMOKING)}"
+    try:
+        if not (0 <= float(data['age']) <= 120):
+            return "age must be 0–120"
+        if not (10 <= float(data['bmi']) <= 70):
+            return "bmi must be 10–70"
+        if not (0 <= float(data['HbA1c_level']) <= 20):
+            return "HbA1c_level must be 0–20"
+        if not (0 <= float(data['blood_glucose_level']) <= 500):
+            return "blood_glucose_level must be 0–500"
+        if int(data['hypertension']) not in (0, 1):
+            return "hypertension must be 0 or 1"
+        if int(data['heart_disease']) not in (0, 1):
+            return "heart_disease must be 0 or 1"
+    except (KeyError, ValueError, TypeError) as exc:
+        return f"Invalid or missing field: {exc}"
+    return None
+
+
+# ── Flask app ────────────────────────────────────────────────────────────────
+
+app = Flask(__name__)
+model        = None
+train_columns = []
 
 
 @app.route('/')
@@ -157,79 +188,42 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    if model is None:
+        return jsonify({'error': 'Model not ready'}), 503
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+
+    error = validate(data)
+    if error:
+        return jsonify({'error': error}), 400
+
     try:
-        if model is None or scaler is None:
-            return jsonify({'error': 'Model not trained. Please check server logs.'}), 500
-
-        data = request.get_json()
-
-        gender          = str(data.get('gender', 'other')).strip()
-        age             = float(data.get('age', 0))
-        hypertension    = int(data.get('hypertension', 0))
-        heart_disease   = int(data.get('heart_disease', 0))
-        smoking_history = str(data.get('smoking_history', 'No Info')).strip()
-        bmi             = float(data.get('bmi', 0))
-        hba1c           = float(data.get('HbA1c_level', 0))
-        blood_glucose   = float(data.get('blood_glucose_level', 0))
-
-        # Validation
-        if not (0 <= age <= 120):
-            return jsonify({'error': 'Age must be between 0 and 120'}), 400
-        if not (10 <= bmi <= 70):
-            return jsonify({'error': 'BMI must be between 10 and 70'}), 400
-        if not (0 <= hba1c <= 20):
-            return jsonify({'error': 'HbA1c must be between 0 and 20'}), 400
-        if not (0 <= blood_glucose <= 500):
-            return jsonify({'error': 'Blood glucose must be between 0 and 500'}), 400
-        if hypertension not in (0, 1):
-            return jsonify({'error': 'Hypertension must be 0 or 1'}), 400
-        if heart_disease not in (0, 1):
-            return jsonify({'error': 'Heart disease must be 0 or 1'}), 400
-
-        gender_enc  = GENDER_MAP.get(gender.lower(), 2)
-        smoking_enc = SMOKING_MAP.get(smoking_history.lower(), 1)
-
-        input_features = np.array([[
-            gender_enc, age, hypertension, heart_disease,
-            smoking_enc, bmi, hba1c, blood_glucose
-        ]])
-
-        input_scaled = scaler.transform(input_features)
-        proba = model.predict_proba(input_scaled)[0]
-
-        prob_non_diabetic = float(proba[0])
-        prob_diabetic     = float(proba[1])
-
-        final_prediction = 1 if prob_diabetic > 0.5 else 0
-        confidence = prob_diabetic if final_prediction == 1 else prob_non_diabetic
-
-        result = {
-            'prediction':             'Diabetic' if final_prediction == 1 else 'Not Diabetic',
-            'confidence':             round(confidence * 100, 1),
-            'probability_diabetic':   round(prob_diabetic * 100, 1),
-            'probability_non_diabetic': round(prob_non_diabetic * 100, 1)
-        }
+        result = predict_one(data)
         return jsonify(result)
-
-    except ValueError as e:
-        return jsonify({'error': f'Invalid input: {str(e)}'}), 400
-    except Exception as e:
-        return jsonify({'error': f'Prediction error: {str(e)}'}), 500
+    except Exception as exc:
+        return jsonify({'error': str(exc)}), 500
 
 
-# ── Train on startup ──
-csv_file = 'diabetes_prediction_dataset.csv'
-print("\n" + "=" * 60)
-print("INITIALIZING DIABETES PREDICTION SYSTEM")
-print("=" * 60)
+# ── Startup ──────────────────────────────────────────────────────────────────
 
-success = train_model(csv_file)
+print("=" * 55)
+print("  DIABETES PREDICTION — STARTING")
+print("=" * 55)
 
-if not success:
-    print("\nWARNING: Model training failed! Predictions will not work.\n")
+# Load a previously saved model if it exists, otherwise train from scratch.
+if os.path.exists(MODEL_PATH):
+    artefact      = joblib.load(MODEL_PATH)
+    model         = artefact['model']
+    train_columns = artefact['train_columns']
+    print(f"Loaded saved model from {MODEL_PATH}")
+else:
+    success = train_model()
+    if not success:
+        print("WARNING: training failed — /predict will return 503")
 
 if __name__ == '__main__':
-    print("\nStarting Flask development server...")
-    print("Visit http://127.0.0.1:5000 in your browser\n")
     port = int(os.environ.get('PORT', 5000))
+    print(f"\nVisit http://127.0.0.1:{port} in your browser\n")
     app.run(debug=False, host='0.0.0.0', port=port)
