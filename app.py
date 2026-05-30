@@ -120,7 +120,6 @@ def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
 # ── Inference ────────────────────────────────────────────────────────────────
 
 def predict_one(input_dict: dict) -> dict:
-    """Run the model on a single patient record (as a plain dict)."""
     row = pd.DataFrame([input_dict])
     row = preprocess(row)
     row = align_columns(row, train_columns)
@@ -130,10 +129,14 @@ def predict_one(input_dict: dict) -> dict:
     prob_non_diabetic = float(proba[0])
     prediction        = 'Diabetic' if prob_diabetic >= 0.5 else 'Not Diabetic'
 
+    # Calculate confidence as the highest probability
+    confidence = max(prob_diabetic, prob_non_diabetic) * 100
+
     return {
-        'prediction':               prediction,
-        'probability_diabetic':     round(prob_diabetic * 100, 1),
+        'prediction': prediction,
+        'probability_diabetic': round(prob_diabetic * 100, 1),
         'probability_non_diabetic': round(prob_non_diabetic * 100, 1),
+        'confidence': round(confidence, 1) # Ensure this is included
     }
 
 

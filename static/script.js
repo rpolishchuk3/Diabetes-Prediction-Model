@@ -4,29 +4,29 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    const predictionForm    = document.getElementById('predictionForm');
-    const predictBtn        = document.getElementById('predictBtn');
-    const resetBtn          = document.getElementById('resetBtn');
-    const resultCard        = document.getElementById('resultCard');
-    const errorCard         = document.getElementById('errorCard');
-    const closeResult       = document.getElementById('closeResult');
-    const closeError        = document.getElementById('closeError');
+    const predictionForm = document.getElementById('predictionForm');
+    const predictBtn = document.getElementById('predictBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultCard = document.getElementById('resultCard');
+    const errorCard = document.getElementById('errorCard');
+    const closeResult = document.getElementById('closeResult');
+    const closeError = document.getElementById('closeError');
 
-    const predictionText    = document.getElementById('predictionText');
-    const confidenceText    = document.getElementById('confidenceText');
-    const diabeticProb      = document.getElementById('diabeticProb');
-    const nonDiabeticProb   = document.getElementById('nonDiabeticProb');
-    const diabeticBar       = document.getElementById('diabeticBar');
-    const nonDiabeticBar    = document.getElementById('nonDiabeticBar');
-    const errorMessage      = document.getElementById('errorMessage');
+    const predictionText = document.getElementById('predictionText');
+    const confidenceText = document.getElementById('confidenceText');
+    const diabeticProb = document.getElementById('diabeticProb');
+    const nonDiabeticProb = document.getElementById('nonDiabeticProb');
+    const diabeticBar = document.getElementById('diabeticBar');
+    const nonDiabeticBar = document.getElementById('nonDiabeticBar');
+    const errorMessage = document.getElementById('errorMessage');
 
-    const genderInput       = document.getElementById('gender');
-    const ageInput          = document.getElementById('age');
+    const genderInput = document.getElementById('gender');
+    const ageInput = document.getElementById('age');
     const hypertensionInput = document.getElementById('hypertension');
     const heartDiseaseInput = document.getElementById('heart_disease');
-    const smokingInput      = document.getElementById('smoking_history');
-    const bmiInput          = document.getElementById('bmi');
-    const hba1cInput        = document.getElementById('hba1c');
+    const smokingInput = document.getElementById('smoking_history');
+    const bmiInput = document.getElementById('bmi');
+    const hba1cInput = document.getElementById('hba1c');
     const bloodGlucoseInput = document.getElementById('blood_glucose');
 
     // ── Loading state ──
@@ -43,14 +43,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function hideAllCards() {
         resultCard.style.display = 'none';
-        errorCard.style.display  = 'none';
+        errorCard.style.display = 'none';
     }
 
     // ── Validation ──
     function validateInputs(data) {
-        const age          = parseFloat(data.age);
-        const bmi          = parseFloat(data.bmi);
-        const hba1c        = parseFloat(data.HbA1c_level);
+        const age = parseFloat(data.age);
+        const bmi = parseFloat(data.bmi);
+        const hba1c = parseFloat(data.HbA1c_level);
         const bloodGlucose = parseFloat(data.blood_glucose_level);
 
         if (!data.gender)
@@ -79,19 +79,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const isDiabetic = data.prediction === 'Diabetic';
 
+        // Robustness: Fallback calculation if data.confidence is undefined
+        const confidenceValue = data.confidence !== undefined
+            ? data.confidence
+            : Math.max(data.probability_diabetic || 0, data.probability_non_diabetic || 0);
+
         resultCard.className = 'result-card ' + (isDiabetic ? 'diabetic' : 'non-diabetic');
-        predictionText.textContent = data.prediction;
-        predictionText.className   = isDiabetic ? 'verdict-text diabetic' : 'verdict-text non-diabetic';
-        confidenceText.textContent = `Confidence: ${Number(data.confidence).toFixed(1)}%`;
+        predictionText.textContent = data.prediction || 'Unknown';
+        predictionText.className = isDiabetic ? 'verdict-text diabetic' : 'verdict-text non-diabetic';
 
-        diabeticProb.textContent    = `${Number(data.probability_diabetic).toFixed(1)}%`;
-        nonDiabeticProb.textContent = `${Number(data.probability_non_diabetic).toFixed(1)}%`;
+        // Safely display the formatted confidence
+        confidenceText.textContent = `Confidence: ${Number(confidenceValue).toFixed(1)}%`;
 
-        diabeticBar.style.width    = '0%';
+        // Safely handle probabilities, defaulting to 0 if missing
+        const probDiabetic = data.probability_diabetic || 0;
+        const probNonDiabetic = data.probability_non_diabetic || 0;
+
+        diabeticProb.textContent = `${Number(probDiabetic).toFixed(1)}%`;
+        nonDiabeticProb.textContent = `${Number(probNonDiabetic).toFixed(1)}%`;
+
+        diabeticBar.style.width = '0%';
         nonDiabeticBar.style.width = '0%';
         setTimeout(() => {
-            diabeticBar.style.width    = `${data.probability_diabetic}%`;
-            nonDiabeticBar.style.width = `${data.probability_non_diabetic}%`;
+            diabeticBar.style.width = `${probDiabetic}%`;
+            nonDiabeticBar.style.width = `${probNonDiabetic}%`;
         }, 80);
 
         resultCard.style.display = 'block';
@@ -102,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function displayError(message) {
         hideAllCards();
         errorMessage.textContent = message;
-        errorCard.style.display  = 'flex';
+        errorCard.style.display = 'flex';
         setTimeout(() => errorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 120);
     }
 
@@ -111,13 +122,13 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
 
         const formData = {
-            gender:              genderInput.value,
-            age:                 ageInput.value,
-            hypertension:        hypertensionInput.value,
-            heart_disease:       heartDiseaseInput.value,
-            smoking_history:     smokingInput.value,
-            bmi:                 bmiInput.value,
-            HbA1c_level:         hba1cInput.value,
+            gender: genderInput.value,
+            age: ageInput.value,
+            hypertension: hypertensionInput.value,
+            heart_disease: heartDiseaseInput.value,
+            smoking_history: smokingInput.value,
+            bmi: bmiInput.value,
+            HbA1c_level: hba1cInput.value,
             blood_glucose_level: bloodGlucoseInput.value
         };
 
@@ -127,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showLoading();
         hideAllCards();
 
-        
+
         try {
             const response = await fetch('/predict', {
                 method: 'POST',
@@ -151,16 +162,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function handleReset() {
         predictionForm.reset();
         hideAllCards();
-        diabeticBar.style.width    = '0%';
+        diabeticBar.style.width = '0%';
         nonDiabeticBar.style.width = '0%';
         document.querySelectorAll('.field input').forEach(i => i.classList.remove('invalid'));
     }
 
     // ── Listeners ──
     if (predictionForm) predictionForm.addEventListener('submit', handleFormSubmit);
-    if (resetBtn)       resetBtn.addEventListener('click', handleReset);
-    if (closeResult)    closeResult.addEventListener('click', () => resultCard.style.display = 'none');
-    if (closeError)     closeError.addEventListener('click',  () => errorCard.style.display  = 'none');
+    if (resetBtn) resetBtn.addEventListener('click', handleReset);
+    if (closeResult) closeResult.addEventListener('click', () => resultCard.style.display = 'none');
+    if (closeError) closeError.addEventListener('click', () => errorCard.style.display = 'none');
 
     // real-time number validation
     document.querySelectorAll('.field input[type="number"]').forEach(input => {
