@@ -43,12 +43,14 @@ The dataset has a roughly 9:1 class imbalance (non-diabetic vs. diabetic), which
 
 ```
 Diabetes-Prediction-Model/
-│ 
-├── templates/
-│   └── index.html
+│
+├── img/
+│   └── diabetes_risk_assessment.png
 ├── static/
 │   ├── style.css
 │   └── script.js
+├── templates/
+│   └── index.html
 ├── .gitignore
 ├── README.md
 ├── app.py
@@ -135,8 +137,6 @@ A single-page interface built with vanilla HTML, CSS, and JavaScript. No framewo
 - Model stats and disclaimer improve transparency  
 
 ![Diabetes Risk Assessment](./img/diabetes_risk_assessment.png)
-
----
 
 ---
 
