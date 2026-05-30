@@ -134,6 +134,8 @@ A single-page interface built with vanilla HTML, CSS, and JavaScript. No framewo
 - Blue accents highlight key actions (e.g., **Predict Diabetes Risk**)  
 - Model stats and disclaimer improve transparency  
 
+![Diabetes Risk Assessment](./img/diabetes_risk_assessment.png)
+
 ---
 
 ---
