@@ -1,11 +1,3 @@
-"""
-Diabetes Prediction — Flask App
-================================
-Model:   Random Forest (class_weight='balanced')
-Dataset: diabetes_prediction_dataset.csv
-Author:  Robert
-"""
-
 import os
 import warnings
 import numpy as np

@@ -27,7 +27,7 @@
                 <span class="nav-dot">·</span>
                 <span>100K patient records</span>
                 <span class="nav-dot">·</span>
-                <span>90.8% accuracy</span>
+                <span>ROC-AUC: 0.93</span>
             </div>
         </div>
     </nav>
@@ -45,8 +45,8 @@
             <div class="sidebar-section">
                 <p class="sidebar-label">Model Stats</p>
                 <div class="stat-row">
-                    <span class="stat-num">90.8%</span>
-                    <span class="stat-desc">Test accuracy</span>
+                    <span class="stat-num">0.93</span>
+                    <span class="stat-desc">ROC-AUC</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-num">100K</span>
@@ -168,7 +168,7 @@
                         <label for="hba1c">HbA1c Level <span class="unit">%</span></label>
                         <input type="number" id="hba1c" name="HbA1c_level" placeholder="e.g., 5.5" min="3" max="15"
                             step="0.1" required>
-                        <span class="field-hint">Normal &lt; 5.7% · Diabetic ≥ 6.5%</span>
+                        <span class="field-hint">Normal &lt; 5.7% · Diabetic > 6.5%</span>
                     </div>
 
                     <div class="field">
@@ -186,7 +186,7 @@
                             <span class="btn-label">Predict Diabetes Risk</span>
                         </span>
                         <span class="btn-loading" style="display:none">
-                            <span class="spinner"></span> Analyzing…
+                            <span class="spinner"></span> Analyzing...
                         </span>
                     </button>
                     <button type="button" class="btn-reset" id="resetBtn">
