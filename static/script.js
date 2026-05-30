@@ -127,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showLoading();
         hideAllCards();
 
+        
         try {
             const response = await fetch('/predict', {
                 method: 'POST',
