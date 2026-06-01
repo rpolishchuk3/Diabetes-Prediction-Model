@@ -3,6 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import joblib
+
 from flask import Flask, render_template, request, jsonify
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -17,6 +18,7 @@ RAW_FEATURES = [
     'gender', 'age', 'hypertension', 'heart_disease',
     'smoking_history', 'bmi', 'HbA1c_level', 'blood_glucose_level'
 ]
+
 TARGET = 'diabetes'
 
 MODEL_PATH = 'diabetes_model.pkl'
@@ -70,14 +72,14 @@ def train_model(csv_path: str = 'diabetes_prediction_dataset.csv') -> bool:
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
-    print("\n── Evaluation (test set) ──────────────────────────────")
+    print("Evaluation (test set)".center(55, "="))
     print(classification_report(y_test, y_pred, target_names=['Not Diabetic', 'Diabetic']))
 
     cm = confusion_matrix(y_test, y_pred)
     print(f"Confusion matrix:\n  TN={cm[0,0]}  FP={cm[0,1]}\n  FN={cm[1,0]}  TP={cm[1,1]}\n")
 
     importances = pd.Series(model.feature_importances_, index=train_columns)
-    print("── Top features ───────────────────────────────────────")
+    print("Top features".center(55, "="))
     print(importances.nlargest(8).to_string())
     print()
 
@@ -162,9 +164,7 @@ def predict():
         return jsonify({'error': str(exc)}), 500
 
 
-print("=" * 55)
-print("  DIABETES PREDICTION — STARTING")
-print("=" * 55)
+print("DIABETES PREDICTION - STARTING".center(55, "="))
 
 if os.path.exists(MODEL_PATH):
     artefact      = joblib.load(MODEL_PATH)

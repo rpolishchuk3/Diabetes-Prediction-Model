@@ -166,6 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    console.log('%c🏥 Diabetes Risk Assessment', 'color:#1d4ed8;font-size:18px;font-weight:600');
+    console.log('%cDiabetes Risk Assessment', 'color:#1d4ed8;font-size:18px;font-weight:600');
     console.log('%cReady', 'color:#16a34a;font-weight:600');
 });
