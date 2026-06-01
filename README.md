@@ -4,7 +4,7 @@ A machine learning web application that predicts diabetes risk from eight clinic
 
 🔗 **Live Demo:** [diabetes-prediction-model-9xar.onrender.com](https://diabetes-prediction-model-9xar.onrender.com)
 
-‼️ **Demo has to be deployed manually** ‼️
+⚠️ **Note: The demo is hosted on Render and may be inactive due to free-tier limitations. If needed, it can be redeployed manually.** ⚠️
 
 ---
 
